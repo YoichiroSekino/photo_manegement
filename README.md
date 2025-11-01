@@ -1,15 +1,16 @@
 # 工事写真自動整理システム (Construction Photo Management System)
 
-**Phase 1 MVP リリース完了！** 🎉 (v0.1.0 - 2025-11-02)
+**Phase 2 Week 11-12 完了！** 🚀 (v0.2.0 - 2025-11-02)
 
-[![Tests](https://img.shields.io/badge/tests-32%20passed-success)](./backend/tests)
+[![Tests](https://img.shields.io/badge/tests-45%20passed-success)](./backend/tests)
 [![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](./backend/htmlcov)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
+[![AWS](https://img.shields.io/badge/AWS-Rekognition-orange)](https://aws.amazon.com/rekognition/)
 
-> **最新情報**: Phase 1 (Week 1-10) が完了しました。写真管理、OCR処理、検索機能が実装され、TDDに基づく高品質なコードベース（97%カバレッジ）を確立しました。詳細は [PHASE1_RELEASE.md](./PHASE1_RELEASE.md) をご覧ください。
+> **最新情報**: Phase 2 AI機能強化が開始されました！Amazon Rekognitionによる画像分類機能を実装し、建設機械・作業員・安全装備などを自動検出できるようになりました。詳細は [PHASE2_WEEK11-12_RELEASE.md](./PHASE2_WEEK11-12_RELEASE.md) をご覧ください。
 
 ## 🚀 クイックスタート
 
@@ -32,18 +33,34 @@ cd frontend && npm install && npm run dev
 
 詳細は [SETUP.md](./SETUP.md) を参照
 
-## 📊 Phase 1 実装状況
+## 📊 実装状況
+
+### Phase 1 MVP（完了）
 
 | 機能 | ステータス | テスト | カバレッジ |
 |------|-----------|--------|-----------|
 | ✅ 写真管理API | 完了 | 4/4 | 100% |
-| ✅ OCR処理（Textract） | 完了 | 11/11 | 96% |
+| ✅ OCR処理（Textract） | 完了 | 11/11 | 97% |
 | ✅ 検索機能 | 完了 | 9/9 | 95% |
 | ✅ データベース設計 | 完了 | - | 100% |
 | ✅ フロントエンド基盤 | 完了 | 19/19 | 100% |
-| 🔄 S3アップロード | Phase 2 | - | - |
-| 🔄 画像分類AI | Phase 2 | - | - |
-| 🔄 電子納品XML | Phase 3 | - | - |
+
+### Phase 2 AI機能強化（進行中）
+
+| 機能 | ステータス | テスト | カバレッジ |
+|------|-----------|--------|-----------|
+| ✅ 画像分類（Rekognition） | **完了** | 13/13 | 97% |
+| 🔄 重複写真検出 | Week 13-14 | - | - |
+| 🔄 画質判定 | Week 15-16 | - | - |
+| 🔄 自動タイトル生成 | Week 17-18 | - | - |
+
+### Phase 3（予定）
+
+| 機能 | ステータス |
+|------|-----------|
+| 🔄 S3マルチパートアップロード | 未着手 |
+| 🔄 電子納品XML生成 | 未着手 |
+| 🔄 写真帳自動作成 | 未着手 |
 
 ## 開発方針
 - 最重要：ドキュメントやGithubのコメントは日本語を使う
