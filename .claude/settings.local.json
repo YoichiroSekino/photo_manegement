@@ -38,7 +38,8 @@
       "Bash(./venv/Scripts/pytest tests/test_api_search.py::test_search_all_photos -v -s)",
       "Bash(./venv/Scripts/pytest tests/test_debug_search.py -v -s)",
       "Bash(./venv/Scripts/pytest tests/test_rekognition_service.py -v)",
-      "Bash(./venv/Scripts/pytest tests/test_api_rekognition.py -v)"
+      "Bash(./venv/Scripts/pytest tests/test_api_rekognition.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_duplicate_detection_service.py -v)"
     ],
     "deny": [],
     "ask": []

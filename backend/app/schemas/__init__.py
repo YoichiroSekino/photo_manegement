@@ -15,6 +15,13 @@ from app.schemas.rekognition import (
     ClassificationResponse,
     ClassificationResultResponse,
 )
+from app.schemas.duplicate import (
+    PhotoHashInfo,
+    DuplicatePhotoInfo,
+    DuplicateGroupResponse,
+    DuplicateDetectionResponse,
+    CalculateHashResponse,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -27,4 +34,9 @@ __all__ = [
     "ImageLabelResponse",
     "ClassificationResponse",
     "ClassificationResultResponse",
+    "PhotoHashInfo",
+    "DuplicatePhotoInfo",
+    "DuplicateGroupResponse",
+    "DuplicateDetectionResponse",
+    "CalculateHashResponse",
 ]
