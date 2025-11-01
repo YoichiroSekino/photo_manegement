@@ -5,7 +5,7 @@ FastAPI メインアプリケーション
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
-from app.routers import photos, ocr, search
+from app.routers import photos, ocr, search, rekognition
 
 # FastAPIアプリケーション初期化
 app = FastAPI(
@@ -25,6 +25,7 @@ app.add_middleware(
 
 # ルーター登録（順序重要: 具体的なパスを先に登録）
 app.include_router(search.router)  # /api/v1/photos/search
+app.include_router(rekognition.router)  # /api/v1/photos/{photo_id}/classify
 app.include_router(ocr.router)  # /api/v1/photos/{photo_id}/process-ocr
 app.include_router(photos.router)  # /api/v1/photos/{photo_id}
 

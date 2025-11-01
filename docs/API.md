@@ -1,6 +1,6 @@
 # 工事写真自動整理システム API ドキュメント
 
-**バージョン**: 0.1.0 (Phase 1 MVP)
+**バージョン**: 0.2.0 (Phase 2 - AI機能強化)
 **最終更新**: 2025-11-02
 
 ---
@@ -12,9 +12,10 @@
 3. [エンドポイント一覧](#エンドポイント一覧)
 4. [写真管理API](#写真管理api)
 5. [OCR処理API](#ocr処理api)
-6. [検索API](#検索api)
-7. [エラーレスポンス](#エラーレスポンス)
-8. [データモデル](#データモデル)
+6. [画像分類API](#画像分類api)
+7. [検索API](#検索api)
+8. [エラーレスポンス](#エラーレスポンス)
+9. [データモデル](#データモデル)
 
 ---
 
@@ -65,6 +66,13 @@ Phase 1 MVPでは認証は実装されていません。Phase 2で実装予定�
 |---------|--------------|------|
 | POST | `/photos/{id}/process-ocr` | OCR処理を実行 |
 | GET | `/photos/{id}/ocr-result` | OCR結果を取得 |
+
+### 画像分類（Rekognition）
+
+| メソッド | エンドポイント | 説明 |
+|---------|--------------|------|
+| POST | `/photos/{id}/classify` | 画像分類を実行 |
+| GET | `/photos/{id}/classification` | 分類結果を取得 |
 
 ### 検索
 
@@ -274,6 +282,123 @@ Phase 1 MVPでは認証は実装されていません。Phase 2で実装予定�
 
 ---
 
+## 画像分類API
+
+### 画像分類を実行
+
+Amazon Rekognitionを使用して写真から物体・シーン・作業員・安全装備などを検出します。
+
+**エンドポイント**: `POST /api/v1/photos/{id}/classify`
+
+**パスパラメータ**:
+
+| パラメータ | 型 | 説明 |
+|-----------|---|------|
+| id | integer | 写真ID |
+
+**レスポンス**: `200 OK`
+
+```json
+{
+  "photo_id": 1,
+  "status": "completed",
+  "labels": [
+    {
+      "name": "Construction",
+      "confidence": 95.5,
+      "parents": []
+    },
+    {
+      "name": "Excavator",
+      "confidence": 92.3,
+      "parents": []
+    },
+    {
+      "name": "Worker",
+      "confidence": 88.7,
+      "parents": ["Person"]
+    },
+    {
+      "name": "Helmet",
+      "confidence": 90.1,
+      "parents": ["Safety Equipment"]
+    }
+  ],
+  "categorized_labels": {
+    "equipment": ["Excavator"],
+    "people": ["Worker"],
+    "safety": ["Helmet"],
+    "materials": [],
+    "scene": ["Construction"],
+    "other": []
+  },
+  "summary": {
+    "total_labels": 4,
+    "max_confidence": 95.5,
+    "avg_confidence": 91.65,
+    "top_labels": ["Construction", "Excavator", "Helmet", "Worker"],
+    "has_construction_content": true
+  }
+}
+```
+
+### 分類結果を取得
+
+写真の画像分類結果を取得します。
+
+**エンドポイント**: `GET /api/v1/photos/{id}/classification`
+
+**パスパラメータ**:
+
+| パラメータ | 型 | 説明 |
+|-----------|---|------|
+| id | integer | 写真ID |
+
+**レスポンス（処理済み）**: `200 OK`
+
+```json
+{
+  "photo_id": 1,
+  "status": "completed",
+  "labels": [
+    {
+      "name": "Construction",
+      "confidence": 95.5,
+      "parents": []
+    }
+  ],
+  "categorized_labels": {
+    "equipment": [],
+    "people": [],
+    "safety": [],
+    "materials": [],
+    "scene": ["Construction"],
+    "other": []
+  },
+  "summary": {
+    "total_labels": 1,
+    "max_confidence": 95.5,
+    "avg_confidence": 95.5,
+    "top_labels": ["Construction"],
+    "has_construction_content": true
+  }
+}
+```
+
+**レスポンス（未処理）**: `200 OK`
+
+```json
+{
+  "photo_id": 1,
+  "status": "not_processed",
+  "labels": [],
+  "categorized_labels": null,
+  "summary": null
+}
+```
+
+---
+
 ## 検索API
 
 ### 写真を検索
@@ -435,6 +560,28 @@ interface BlackboardData {
 }
 ```
 
+### ImageLabel
+
+```typescript
+interface ImageLabel {
+  name: string;        // ラベル名
+  confidence: number;  // 信頼度（0-100）
+  parents: string[];   // 親カテゴリ
+}
+```
+
+### ClassificationSummary
+
+```typescript
+interface ClassificationSummary {
+  total_labels: number;           // 検出ラベル総数
+  max_confidence: number;         // 最大信頼度
+  avg_confidence: number;         // 平均信頼度
+  top_labels: string[];          // 上位5ラベル
+  has_construction_content: boolean;  // 建設関連コンテンツ有無
+}
+```
+
 ---
 
 ## 使用例
@@ -465,7 +612,33 @@ curl http://localhost:8000/api/v1/photos/1/ocr-result
 # レスポンス: {"photo_id": 1, "status": "completed", "work_name": "○○工事", ...}
 ```
 
-### シナリオ2: 写真検索
+### シナリオ2: 画像分類処理
+
+```bash
+# 1. 写真メタデータを登録
+curl -X POST http://localhost:8000/api/v1/photos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_name": "construction_site001.jpg",
+    "file_size": 3145728,
+    "mime_type": "image/jpeg",
+    "s3_key": "photos/construction_site001.jpg"
+  }'
+
+# レスポンス: {"id": 2, ...}
+
+# 2. 画像分類を実行
+curl -X POST http://localhost:8000/api/v1/photos/2/classify
+
+# レスポンス: {"photo_id": 2, "status": "completed", "labels": [...], "categorized_labels": {...}, "summary": {...}}
+
+# 3. 分類結果を確認
+curl http://localhost:8000/api/v1/photos/2/classification
+
+# レスポンス: 建設機械、作業員、安全装備などのラベル情報
+```
+
+### シナリオ3: 写真検索
 
 ```bash
 # キーワード検索
@@ -485,14 +658,16 @@ curl "http://localhost:8000/api/v1/photos/search?keyword=配筋&work_type=基礎
 
 ## 次のステップ（Phase 2予定）
 
+- ✅ 画像分類AI統合（Rekognition）- **完了**
+- 重複写真検出
+- 画質・品質自動判定
+- 自動タイトル生成
 - 認証・認可機能（JWT）
 - S3署名付きURL生成
-- 画像分類AI統合
-- 重複写真検出
 - WebSocket対応（リアルタイム処理状況）
 - GraphQL API
 
 ---
 
 **ドキュメント作成日**: 2025-11-02
-**Phase 1 MVP リリース**
+**Phase 2 - Week 11-12: Amazon Rekognition統合完了**

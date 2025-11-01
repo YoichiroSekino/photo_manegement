@@ -24,7 +24,21 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: プロジェクトセットアップ・環境構築\n\nPhase 1 Week 1-2の実装完了\n\n## 実装内容\n\n### プロジェクト基盤\n- ディレクトリ構造作成（frontend, backend, infrastructure）\n- .gitignore設定（Node.js, Python, Docker, AWS対応）\n- モノレポ管理設定（npm workspaces）\n- Prettier設定\n- VS Code設定ファイル\n\n### フロントエンド\n- Next.js 14 + TypeScript + Tailwind CSS セットアップ\n- Jest + React Testing Library設定\n- ESLint, Prettierリンター設定\n- 初期ページ実装（ホームページ）\n- テスト実装（カバレッジ100%達成）\n\n### バックエンド\n- FastAPI + Python 3.11 セットアップ\n- Pytest + カバレッジ設定\n- Black, Pylint, MyPy設定\n- 初期APIエンドポイント実装\n  - GET / (ルート)\n  - GET /health (ヘルスチェック)\n  - GET /api/v1/info (API情報)\n- テスト実装（カバレッジ100%達成）\n\n### Docker環境\n- PostgreSQL 15コンテナ設定\n- Redis 7コンテナ設定\n- pgAdminコンテナ設定\n- データベース初期化スクリプト\n\n### CI/CD\n- GitHub Actions ワークフロー設定\n  - test.yml（自動テスト実行）\n  - lint.yml（コード品質チェック）\n\n### ドキュメント\n- SETUP.md（環境構築手順）\n- CONTRIBUTING.md（開発ガイドライン）\n\n## テスト結果\n- Frontend: 3 passed (100% coverage)\n- Backend: 3 passed (100% coverage)\n\n## TDD原則\n全ての実装でRed→Green→Refactorサイクルを実践\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: フロントエンド基盤開発（Week 3-4）\n\nPhase 1 フロントエンド基盤の実装完了\n\n## 実装内容\n\n### App Router構造\n- アップロードページ（/upload）\n- 写真一覧ページ（/photos）\n- 型定義（Photo, PhotoCategory, PhotoMetadata）\n\n### コンポーネント実装（TDD）\n- **DragDropZone**: ドラッグ&ドロップアップロード\n  - ファイル選択機能\n  - JPEG/TIFF形式対応\n  - ドラッグオーバーUI\n  - テスト: 6件全てパス\n\n- **PhotoCard**: 写真カード表示\n  - サムネイル表示\n  - メタデータ表示\n  - クリックハンドリング\n  - テスト: 6件全てパス\n\n- **PhotoGrid**: 写真グリッド表示\n  - レスポンシブグリッドレイアウト\n  - 空状態表示\n\n### ファイルバリデーション\n- ファイル形式チェック（JPEG/TIFF）\n- ファイルサイズチェック（10MB上限）\n- ファイル名検証（長さ、無効文字）\n- 複数ファイル一括検証\n- テスト: 10件全てパス\n\n### アップロードページ機能\n- ドラッグ&ドロップUI\n- ファイル選択リスト表示\n- バリデーションエラー表示\n- アップロード準備（S3実装は次フェーズ）\n\n## テスト結果\n- 全テスト: 19 passed\n- DragDropZone: 6/6 passed\n- PhotoCard: 6/6 passed\n- fileValidator: 10/10 passed\n\n## TDD実践\n全てのコンポーネントでRed→Green→Refactorサイクルを実践\n\n## 次のステップ\n- S3マルチパートアップロード実装\n- 状態管理（Zustand + React Query）\n- 写真詳細ページ\n- 検索・フィルター機能\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(./venv/Scripts/pytest tests/test_schemas.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_api_photos.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_debug.py -v -s)",
+      "Bash(./venv/Scripts/pytest tests/test_api_photos.py::test_create_photo -v -s)",
+      "Bash(./venv/Scripts/pytest --cov-report=term-missing)",
+      "Bash(git commit:*)",
+      "Bash(./venv/Scripts/pytest tests/test_ocr_service.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_api_ocr.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_api_search.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_api_search.py::test_search_all_photos -v -s)",
+      "Bash(./venv/Scripts/pytest tests/test_debug_search.py -v -s)",
+      "Bash(./venv/Scripts/pytest tests/test_rekognition_service.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_api_rekognition.py -v)"
     ],
     "deny": [],
     "ask": []
