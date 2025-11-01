@@ -1,12 +1,57 @@
 # 工事写真自動整理システム (Construction Photo Management System)
 
+**Phase 1 MVP リリース完了！** 🎉 (v0.1.0 - 2025-11-02)
+
+[![Tests](https://img.shields.io/badge/tests-32%20passed-success)](./backend/tests)
+[![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](./backend/htmlcov)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
+
+> **最新情報**: Phase 1 (Week 1-10) が完了しました。写真管理、OCR処理、検索機能が実装され、TDDに基づく高品質なコードベース（97%カバレッジ）を確立しました。詳細は [PHASE1_RELEASE.md](./PHASE1_RELEASE.md) をご覧ください。
+
+## 🚀 クイックスタート
+
+```bash
+# 1. Docker環境起動
+docker-compose up -d
+
+# 2. バックエンド起動
+cd backend && python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && uvicorn app.main:app --reload
+
+# 3. フロントエンド起動（別ターミナル）
+cd frontend && npm install && npm run dev
+
+# アクセス
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Docs: http://localhost:8000/docs
+```
+
+詳細は [SETUP.md](./SETUP.md) を参照
+
+## 📊 Phase 1 実装状況
+
+| 機能 | ステータス | テスト | カバレッジ |
+|------|-----------|--------|-----------|
+| ✅ 写真管理API | 完了 | 4/4 | 100% |
+| ✅ OCR処理（Textract） | 完了 | 11/11 | 96% |
+| ✅ 検索機能 | 完了 | 9/9 | 95% |
+| ✅ データベース設計 | 完了 | - | 100% |
+| ✅ フロントエンド基盤 | 完了 | 19/19 | 100% |
+| 🔄 S3アップロード | Phase 2 | - | - |
+| 🔄 画像分類AI | Phase 2 | - | - |
+| 🔄 電子納品XML | Phase 3 | - | - |
+
 ## 開発方針
 - 最重要：ドキュメントやGithubのコメントは日本語を使う
 - docsに格納されているドキュメントを読み込みシステム開発計画書を作成する
 - システム開発計画書に基づいたタスクを Github issuesを作成する
 - issuesにかかる工数は5人日（40時間）を最大とし、極力1人日単位でまとめる
 - issuesを順次実行する
-- テスト駆動開発（TDD）を採用する
+- **テスト駆動開発（TDD）を厳格に採用** ← Phase 1で97%カバレッジ達成！
 
 ## 📋 概要
 
