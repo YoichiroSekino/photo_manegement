@@ -5,6 +5,7 @@ FastAPI メインアプリケーション
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
+from app.routers import photos
 
 # FastAPIアプリケーション初期化
 app = FastAPI(
@@ -21,6 +22,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ルーター登録
+app.include_router(photos.router)
 
 
 @app.get("/")

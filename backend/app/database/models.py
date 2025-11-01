@@ -1,0 +1,92 @@
+"""
+SQLAlchemyデータベースモデル
+工事写真管理システム
+"""
+
+from datetime import datetime
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Text,
+    Boolean,
+    ForeignKey,
+    JSON,
+    BigInteger,
+)
+from sqlalchemy.orm import relationship, declarative_base
+
+Base = declarative_base()
+
+
+class Photo(Base):
+    """写真テーブル"""
+
+    __tablename__ = "photos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    file_name = Column(String(255), nullable=False)
+    file_size = Column(BigInteger, nullable=False)
+    mime_type = Column(String(100), nullable=False)
+    s3_key = Column(String(500), nullable=False, unique=True)
+    s3_url = Column(String(1000), nullable=True)
+    thumbnail_url = Column(String(1000), nullable=True)
+
+    # 写真情報
+    title = Column(String(255), nullable=True)
+    description = Column(Text, nullable=True)
+    shooting_date = Column(DateTime, nullable=True)
+
+    # 位置情報
+    latitude = Column(String(50), nullable=True)
+    longitude = Column(String(50), nullable=True)
+    location_address = Column(String(500), nullable=True)
+
+    # カテゴリ情報
+    major_category = Column(String(50), nullable=True)  # 写真-大分類
+    photo_type = Column(String(100), nullable=True)  # 写真区分
+    work_type = Column(String(100), nullable=True)  # 工種
+    work_kind = Column(String(100), nullable=True)  # 種別
+    work_detail = Column(String(100), nullable=True)  # 細別
+
+    # メタデータ（JSONB）
+    photo_metadata = Column("metadata", JSON, nullable=True)
+
+    # タグ
+    tags = Column(JSON, nullable=True)
+
+    # ステータス
+    is_processed = Column(Boolean, default=False)
+    is_representative = Column(Boolean, default=False)  # 代表写真
+    is_submission_frequency = Column(Boolean, default=False)  # 提出頻度写真
+
+    # タイムスタンプ
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<Photo(id={self.id}, file_name='{self.file_name}')>"
+
+
+class Project(Base):
+    """プロジェクトテーブル"""
+
+    __tablename__ = "projects"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    client_name = Column(String(255), nullable=True)
+    start_date = Column(DateTime, nullable=True)
+    end_date = Column(DateTime, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<Project(id={self.id}, name='{self.name}')>"
