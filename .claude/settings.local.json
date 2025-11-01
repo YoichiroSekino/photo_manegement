@@ -21,7 +21,10 @@
       "Bash(docker-compose down:*)",
       "Bash(docker exec:*)",
       "Bash(./venv/Scripts/pytest --tb=short)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: プロジェクトセットアップ・環境構築\n\nPhase 1 Week 1-2の実装完了\n\n## 実装内容\n\n### プロジェクト基盤\n- ディレクトリ構造作成（frontend, backend, infrastructure）\n- .gitignore設定（Node.js, Python, Docker, AWS対応）\n- モノレポ管理設定（npm workspaces）\n- Prettier設定\n- VS Code設定ファイル\n\n### フロントエンド\n- Next.js 14 + TypeScript + Tailwind CSS セットアップ\n- Jest + React Testing Library設定\n- ESLint, Prettierリンター設定\n- 初期ページ実装（ホームページ）\n- テスト実装（カバレッジ100%達成）\n\n### バックエンド\n- FastAPI + Python 3.11 セットアップ\n- Pytest + カバレッジ設定\n- Black, Pylint, MyPy設定\n- 初期APIエンドポイント実装\n  - GET / (ルート)\n  - GET /health (ヘルスチェック)\n  - GET /api/v1/info (API情報)\n- テスト実装（カバレッジ100%達成）\n\n### Docker環境\n- PostgreSQL 15コンテナ設定\n- Redis 7コンテナ設定\n- pgAdminコンテナ設定\n- データベース初期化スクリプト\n\n### CI/CD\n- GitHub Actions ワークフロー設定\n  - test.yml（自動テスト実行）\n  - lint.yml（コード品質チェック）\n\n### ドキュメント\n- SETUP.md（環境構築手順）\n- CONTRIBUTING.md（開発ガイドライン）\n\n## テスト結果\n- Frontend: 3 passed (100% coverage)\n- Backend: 3 passed (100% coverage)\n\n## TDD原則\n全ての実装でRed→Green→Refactorサイクルを実践\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []
