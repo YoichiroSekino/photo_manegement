@@ -1,0 +1,37 @@
+{
+  "name": "construction-photo-management",
+  "version": "0.1.0",
+  "description": "工事写真自動整理システム - Construction Photo Management System",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "construction",
+    "photo-management",
+    "ocr",
+    "ai",
+    "photo-xml",
+    "digital-construction"
+  ],
+  "author": "株式会社ウィズテック",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YoichiroSekino/photo_manegement.git"
+  }
+}
