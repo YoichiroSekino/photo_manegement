@@ -9,6 +9,7 @@ from app.schemas.photo import (
     PhotoListResponse,
     PhotoCategory,
 )
+from app.schemas.search import SearchQuery, SearchResponse
 
 __all__ = [
     "PhotoCreate",
@@ -16,4 +17,6 @@ __all__ = [
     "PhotoResponse",
     "PhotoListResponse",
     "PhotoCategory",
+    "SearchQuery",
+    "SearchResponse",
 ]
