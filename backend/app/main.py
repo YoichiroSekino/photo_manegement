@@ -2,10 +2,17 @@
 FastAPI メインアプリケーション
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from app import __version__
-from app.routers import photos, ocr, search, rekognition, duplicate, quality, title, photo_xml, export, photo_album
+from app.routers import photos, ocr, search, rekognition, duplicate, quality, title, photo_xml, export, photo_album, auth
+
+# Rate limiter初期化
+limiter = Limiter(key_func=get_remote_address)
 
 # FastAPIアプリケーション初期化
 app = FastAPI(
@@ -13,6 +20,10 @@ app = FastAPI(
     description="工事写真自動整理システム バックエンドAPI",
     version=__version__,
 )
+
+# Rate limiterをアプリケーションに追加
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS設定
 app.add_middleware(
@@ -24,6 +35,7 @@ app.add_middleware(
 )
 
 # ルーター登録（順序重要: 具体的なパスを先に登録）
+app.include_router(auth.router)  # /api/v1/auth
 app.include_router(photo_album.router)  # /api/v1/photo-album/generate-pdf
 app.include_router(export.router)  # /api/v1/export/package
 app.include_router(photo_xml.router)  # /api/v1/photo-xml/generate
