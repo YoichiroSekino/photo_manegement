@@ -1,0 +1,72 @@
+<!-- PHOTO05.DTD - デジタル写真管理情報基準 (令和5年3月版) -->
+<!-- 国土交通省 電子納品要領 -->
+
+<!ELEMENT photodata (基礎情報, 写真情報+)>
+<!ATTLIST photodata DTD_version CDATA #REQUIRED>
+
+<!ELEMENT 基礎情報 (写真フォルダ名, 適用要領基準)>
+<!ELEMENT 写真フォルダ名 (#PCDATA)>
+<!ELEMENT 適用要領基準 (#PCDATA)>
+
+<!ELEMENT 写真情報 (写真ファイル情報, 撮影工種区分?, 施工管理値?, 参考図?)>
+
+<!ELEMENT 写真ファイル情報 (
+  シリアル番号,
+  写真ファイル名,
+  メディア番号?,
+  工事写真帳番号?,
+  写真-大分類,
+  写真-小分類?,
+  写真区分,
+  写真タイトル,
+  撮影年月日,
+  撮影工種名?,
+  測点情報?,
+  撮影箇所名?,
+  撮影内容?,
+  立会者名?,
+  代表写真,
+  提出頻度写真?,
+  施工状況?,
+  工事名称?,
+  工事番号?,
+  請負者名?,
+  発注者名?
+)>
+
+<!ELEMENT シリアル番号 (#PCDATA)>
+<!ELEMENT 写真ファイル名 (#PCDATA)>
+<!ELEMENT メディア番号 (#PCDATA)>
+<!ELEMENT 工事写真帳番号 (#PCDATA)>
+<!ELEMENT 写真-大分類 (#PCDATA)>
+<!ELEMENT 写真-小分類 (#PCDATA)>
+<!ELEMENT 写真区分 (#PCDATA)>
+<!ELEMENT 写真タイトル (#PCDATA)>
+<!ELEMENT 撮影年月日 (#PCDATA)>
+<!ELEMENT 撮影工種名 (#PCDATA)>
+<!ELEMENT 測点情報 (#PCDATA)>
+<!ELEMENT 撮影箇所名 (#PCDATA)>
+<!ELEMENT 撮影内容 (#PCDATA)>
+<!ELEMENT 立会者名 (#PCDATA)>
+<!ELEMENT 代表写真 (#PCDATA)>
+<!ELEMENT 提出頻度写真 (#PCDATA)>
+<!ELEMENT 施工状況 (#PCDATA)>
+<!ELEMENT 工事名称 (#PCDATA)>
+<!ELEMENT 工事番号 (#PCDATA)>
+<!ELEMENT 請負者名 (#PCDATA)>
+<!ELEMENT 発注者名 (#PCDATA)>
+
+<!ELEMENT 撮影工種区分 (工種, 種別?, 細別?)>
+<!ELEMENT 工種 (#PCDATA)>
+<!ELEMENT 種別 (#PCDATA)>
+<!ELEMENT 細別 (#PCDATA)>
+
+<!ELEMENT 施工管理値 (設計値?, 実測値?, 設計寸法?, 実測寸法?)>
+<!ELEMENT 設計値 (#PCDATA)>
+<!ELEMENT 実測値 (#PCDATA)>
+<!ELEMENT 設計寸法 (#PCDATA)>
+<!ELEMENT 実測寸法 (#PCDATA)>
+
+<!ELEMENT 参考図 (参考図シリアル番号, 参考図ファイル名)+>
+<!ELEMENT 参考図シリアル番号 (#PCDATA)>
+<!ELEMENT 参考図ファイル名 (#PCDATA)>
