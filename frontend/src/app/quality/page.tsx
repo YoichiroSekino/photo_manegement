@@ -4,9 +4,13 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { QualityBadge } from '@/components/quality/QualityBadge';
 import { QualityDetails } from '@/components/quality/QualityDetails';
+import { usePhotos, useAssessQuality } from '@/hooks/usePhotos';
 import { Photo } from '@/types/photo';
 
 interface QualityPhoto extends Photo {
@@ -20,80 +24,118 @@ interface QualityPhoto extends Photo {
 }
 
 export default function QualityPage() {
-  // TODO: 実際のデータはAPIから取得
-  const [photos, setPhotos] = useState<QualityPhoto[]>([]);
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [selectedPhoto, setSelectedPhoto] = useState<QualityPhoto | null>(null);
   const [qualityFilter, setQualityFilter] = useState<'all' | 'good' | 'fair' | 'poor'>('all');
-  const [isAssessing, setIsAssessing] = useState(false);
+  const [processingPhotoId, setProcessingPhotoId] = useState<number | null>(null);
 
-  const handleAssessQuality = async () => {
-    setIsAssessing(true);
-    try {
-      // TODO: 品質評価APIを呼び出す
-      const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiEndpoint}/api/v1/photos/assess-quality`, {
-        method: 'POST',
+  // 認証チェック
+  if (!authLoading && !isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
+
+  // 全写真取得
+  const { data: photosData } = usePhotos({ page_size: 100 });
+  const { mutate: assessQuality } = useAssessQuality();
+
+  // 品質スコアを持つ写真のみ抽出
+  const qualityPhotos: QualityPhoto[] = useMemo(() => {
+    if (!photosData?.photos) return [];
+
+    return photosData.photos
+      .filter(photo => photo.metadata?.quality?.sharpness !== undefined)
+      .map(photo => {
+        const quality = photo.metadata?.quality;
+        const issues = quality?.issues || [];
+        const recommendations = quality?.recommendations || [];
+
+        // issuesとrecommendationsを構造化
+        const qualityIssues = issues.map((issue, index) => ({
+          type: 'quality_check',
+          severity: (issue.includes('低') || issue.includes('暗') || issue.includes('不足'))
+            ? 'high' as const
+            : 'medium' as const,
+          message: issue,
+          recommendation: recommendations[index] || undefined,
+        }));
+
+        return {
+          ...photo,
+          qualityScore: quality?.score ?? Math.round((quality?.sharpness ?? 0) * 100),
+          qualityIssues,
+        };
       });
+  }, [photosData]);
 
-      if (!response.ok) {
-        throw new Error('Quality assessment failed');
-      }
-
-      const result = await response.json();
-      console.log('Quality assessment result:', result);
-
-      // TODO: 結果を取得してphotosに設定
-    } catch (error) {
-      console.error('Error assessing quality:', error);
+  const handleAssessQuality = async (photoId: number) => {
+    setProcessingPhotoId(photoId);
+    try {
+      await assessQuality(photoId);
     } finally {
-      setIsAssessing(false);
+      setProcessingPhotoId(null);
     }
   };
 
   const getFilteredPhotos = () => {
-    if (qualityFilter === 'all') return photos;
-    if (qualityFilter === 'good') return photos.filter((p) => p.qualityScore >= 80);
+    if (qualityFilter === 'all') return qualityPhotos;
+    if (qualityFilter === 'good') return qualityPhotos.filter((p) => p.qualityScore >= 80);
     if (qualityFilter === 'fair')
-      return photos.filter((p) => p.qualityScore >= 40 && p.qualityScore < 80);
-    if (qualityFilter === 'poor') return photos.filter((p) => p.qualityScore < 40);
-    return photos;
+      return qualityPhotos.filter((p) => p.qualityScore >= 40 && p.qualityScore < 80);
+    if (qualityFilter === 'poor') return qualityPhotos.filter((p) => p.qualityScore < 40);
+    return qualityPhotos;
   };
 
   const filteredPhotos = getFilteredPhotos();
 
   // 品質統計
   const stats = {
-    total: photos.length,
-    good: photos.filter((p) => p.qualityScore >= 80).length,
-    fair: photos.filter((p) => p.qualityScore >= 40 && p.qualityScore < 80).length,
-    poor: photos.filter((p) => p.qualityScore < 40).length,
+    total: qualityPhotos.length,
+    good: qualityPhotos.filter((p) => p.qualityScore >= 80).length,
+    fair: qualityPhotos.filter((p) => p.qualityScore >= 40 && p.qualityScore < 80).length,
+    poor: qualityPhotos.filter((p) => p.qualityScore < 40).length,
     average:
-      photos.length > 0
+      qualityPhotos.length > 0
         ? Math.round(
-            photos.reduce((sum, p) => sum + p.qualityScore, 0) / photos.length
+            qualityPhotos.reduce((sum, p) => sum + p.qualityScore, 0) / qualityPhotos.length
           )
         : 0,
   };
 
   return (
-    <main className="flex min-h-screen flex-col p-8">
+    <main className="flex min-h-screen flex-col p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto w-full">
         {/* ヘッダー */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">品質評価</h1>
-          <p className="text-gray-600">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">品質評価</h1>
+          <p className="text-sm sm:text-base text-gray-600">
             写真の品質を評価し、基準を満たさない写真を特定します
           </p>
         </div>
 
         {/* 統計カード */}
-        {photos.length > 0 && (
-          <div className="grid grid-cols-5 gap-4 mb-6">
+        {qualityPhotos.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
             <StatCard label="総写真数" value={stats.total} />
             <StatCard label="平均スコア" value={`${stats.average}点`} color="text-blue-600" />
             <StatCard label="優良" value={stats.good} color="text-green-600" />
             <StatCard label="標準" value={stats.fair} color="text-yellow-600" />
             <StatCard label="要改善" value={stats.poor} color="text-red-600" />
+          </div>
+        )}
+
+        {/* 未評価写真の情報 */}
+        {photosData?.photos && photosData.photos.length > qualityPhotos.length && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <p className="text-sm text-yellow-800">
+                {photosData.photos.length - qualityPhotos.length}件の写真が未評価です。写真を選択して個別に品質評価を実行してください。
+              </p>
+            </div>
           </div>
         )}
 
@@ -113,48 +155,14 @@ export default function QualityPage() {
             </select>
 
             <span className="text-sm text-gray-600">
-              {filteredPhotos.length}件の写真
+              {filteredPhotos.length}件の写真（評価済み）
             </span>
           </div>
-
-          {/* 品質評価ボタン */}
-          <button
-            onClick={handleAssessQuality}
-            disabled={isAssessing}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
-          >
-            {isAssessing ? (
-              <span className="flex items-center space-x-2">
-                <svg
-                  className="animate-spin h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                <span>評価中...</span>
-              </span>
-            ) : (
-              '品質を評価'
-            )}
-          </button>
         </div>
 
         {/* 写真グリッド */}
         {filteredPhotos.length > 0 ? (
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {filteredPhotos.map((photo) => (
               <div
                 key={photo.id}
@@ -163,10 +171,13 @@ export default function QualityPage() {
               >
                 <div className="aspect-video bg-gray-100 relative">
                   {photo.s3Url ? (
-                    <img
+                    <Image
                       src={photo.s3Url}
                       alt={photo.fileName}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      priority={false}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
@@ -225,16 +236,16 @@ export default function QualityPage() {
         {/* 詳細モーダル */}
         {selectedPhoto && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-8"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 lg:p-8"
             onClick={() => setSelectedPhoto(null)}
           >
             <div
-              className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">{selectedPhoto.fileName}</h2>
+                  <h2 className="text-lg sm:text-xl font-bold truncate pr-4">{selectedPhoto.fileName}</h2>
                   <button
                     onClick={() => setSelectedPhoto(null)}
                     className="text-gray-400 hover:text-gray-600"
@@ -255,13 +266,18 @@ export default function QualityPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <img
-                      src={selectedPhoto.s3Url}
-                      alt={selectedPhoto.fileName}
-                      className="w-full rounded-lg"
-                    />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="relative aspect-video">
+                    {selectedPhoto.s3Url && (
+                      <Image
+                        src={selectedPhoto.s3Url}
+                        alt={selectedPhoto.fileName}
+                        fill
+                        className="object-contain rounded-lg"
+                        sizes="50vw"
+                        priority
+                      />
+                    )}
                   </div>
                   <div>
                     <QualityDetails

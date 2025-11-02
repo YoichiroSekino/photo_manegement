@@ -9,6 +9,10 @@ const nextConfig = {
       },
     ],
     formats: ['image/webp', 'image/avif'],
+    // 画像キャッシュ最適化
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30日
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
   // 環境変数
@@ -21,6 +25,14 @@ const nextConfig = {
 
   // 出力設定
   output: 'standalone',
+
+  // パフォーマンス最適化
+  compiler: {
+    // プロダクションビルドでconsole.logを削除
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
 };
 
 module.exports = nextConfig;

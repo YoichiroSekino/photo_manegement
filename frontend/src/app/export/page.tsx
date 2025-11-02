@@ -1,21 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { ExportWizard, ExportOptions } from '@/components/export/ExportWizard';
 import { PhotoAlbumDialog, AlbumOptions } from '@/components/export/PhotoAlbumDialog';
 
 export default function ExportPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [showExportWizard, setShowExportWizard] = useState(false);
   const [showPhotoAlbum, setShowPhotoAlbum] = useState(false);
 
+  // 認証チェック
+  if (!authLoading && !isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
+
   const handleExport = async (selectedPhotoIds: string[], options: ExportOptions) => {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const accessToken = localStorage.getItem('access_token');
 
     try {
       const response = await fetch(`${apiEndpoint}/api/v1/export/package`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           photo_ids: selectedPhotoIds.map(id => parseInt(id, 10)),  // Convert string IDs to numbers for API
@@ -46,12 +58,14 @@ export default function ExportPage() {
 
   const handleGenerateAlbum = async (options: AlbumOptions) => {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const accessToken = localStorage.getItem('access_token');
 
     try {
       const response = await fetch(`${apiEndpoint}/api/v1/photo-album/generate-pdf`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           layout: options.layout,

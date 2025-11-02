@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import { validateFiles, getValidFiles, getErrorMessages } from '@/lib/fileValidator';
 import { PresignedUploader, UploadProgress } from '@/lib/s3Upload';
@@ -11,10 +13,18 @@ interface FileUploadStatus {
 }
 
 export default function UploadPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatuses, setUploadStatuses] = useState<Map<string, FileUploadStatus>>(new Map());
+
+  // 認証チェック
+  if (!authLoading && !isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
 
   const handleFilesSelected = useCallback((files: File[]) => {
     // ファイルバリデーション
@@ -54,7 +64,10 @@ export default function UploadPage() {
       const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const uploadEndpoint = `${apiEndpoint}/api/v1/photos/upload`;
 
-      await PresignedUploader.uploadMultipleWithPresignedUrl(
+      // 認証トークン取得
+      const accessToken = localStorage.getItem('access_token');
+
+      const uploadResults = await PresignedUploader.uploadMultipleWithPresignedUrl(
         selectedFiles,
         uploadEndpoint,
         (fileName, progress) => {
@@ -68,8 +81,38 @@ export default function UploadPage() {
             return newStatuses;
           });
         },
-        5 // 最大5並列
+        5, // 最大5並列
+        accessToken || undefined
       );
+
+      // S3アップロード成功後、写真レコードを作成
+      const createPhotoEndpoint = `${apiEndpoint}/api/v1/photos`;
+      for (let i = 0; i < uploadResults.length; i++) {
+        const result = uploadResults[i];
+        const file = selectedFiles[i];
+
+        try {
+          const response = await fetch(createPhotoEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+            },
+            body: JSON.stringify({
+              file_name: file.name,
+              file_size: file.size,
+              mime_type: file.type,
+              s3_key: result.key,
+            }),
+          });
+
+          if (!response.ok) {
+            console.error(`Failed to create photo record for ${file.name}`);
+          }
+        } catch (error) {
+          console.error(`Error creating photo record for ${file.name}:`, error);
+        }
+      }
 
       // アップロード成功
       console.log('All files uploaded successfully');

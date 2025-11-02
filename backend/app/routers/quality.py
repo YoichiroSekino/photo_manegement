@@ -12,6 +12,7 @@ from app.schemas.quality import (
     QualityCheckResponse,
 )
 from app.services.quality_assessment_service import QualityAssessmentService
+from app.config import settings
 
 router = APIRouter(prefix="/api/v1/photos", tags=["Quality Assessment"])
 
@@ -41,7 +42,7 @@ async def assess_quality(photo_id: int, db: Session = Depends(get_db)):
     try:
         # S3から画像ダウンロード
         service = QualityAssessmentService()
-        s3_bucket = "construction-photos"  # TODO: 環境変数化
+        s3_bucket = settings.S3_BUCKET
         s3_key = photo.s3_key
 
         image_data = service.download_image_from_s3(bucket=s3_bucket, key=s3_key)

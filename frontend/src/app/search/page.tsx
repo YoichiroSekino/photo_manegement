@@ -1,18 +1,33 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { SearchBar } from '@/components/search/SearchBar';
 import { FilterPanel, FilterOptions } from '@/components/search/FilterPanel';
 import { PhotoGrid } from '@/components/photos/PhotoGrid';
-import { useSearchPhotos } from '@/hooks/usePhotos';
+import { PhotoDetailModal } from '@/components/photos/PhotoDetailModal';
+import { useSearchPhotos, usePhoto } from '@/hooks/usePhotos';
 import { useFilterStore } from '@/store/filterStore';
 
 export default function SearchPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
   const { mutate: searchPhotos, data: searchResult, isPending, error } = useSearchPhotos();
+
+  // 認証チェック
+  if (!authLoading && !isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
 
   const filters = useFilterStore((state) => state.filters);
   const setFilter = useFilterStore((state) => state.setFilter);
   const setFilters = useFilterStore((state) => state.setFilters);
+
+  // 選択された写真の詳細を取得
+  const { data: selectedPhoto } = usePhoto(selectedPhotoId);
 
   const performSearch = useCallback(() => {
     searchPhotos({
@@ -26,6 +41,14 @@ export default function SearchPage() {
       photographer: filters.photographer,
     });
   }, [filters, searchPhotos]);
+
+  const handlePhotoSelect = (id: string) => {
+    setSelectedPhotoId(Number(id));
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPhotoId(null);
+  };
 
   const handleSearch = useCallback((searchKeyword: string) => {
     setFilter('searchQuery', searchKeyword);
@@ -48,14 +71,14 @@ export default function SearchPage() {
   }, [performSearch]);
 
   return (
-    <main className="flex min-h-screen flex-col p-8">
+    <main className="flex min-h-screen flex-col p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto w-full">
-        <h1 className="text-3xl font-bold mb-2">写真検索</h1>
-        <p className="text-gray-600 mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">写真検索</h1>
+        <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
           キーワードやフィルターを使用して写真を検索できます。
         </p>
 
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
           <SearchBar onSearch={handleSearch} />
           <FilterPanel onFilterChange={handleFilterChange} />
         </div>
@@ -79,7 +102,7 @@ export default function SearchPage() {
             </div>
 
             {searchResult && searchResult.length > 0 ? (
-              <PhotoGrid photos={searchResult} />
+              <PhotoGrid photos={searchResult} onPhotoSelect={handlePhotoSelect} />
             ) : (
               <div className="text-center py-12">
                 <svg
@@ -104,6 +127,14 @@ export default function SearchPage() {
           </>
         )}
       </div>
+
+      {/* Photo Detail Modal */}
+      {selectedPhoto && (
+        <PhotoDetailModal
+          photo={selectedPhoto}
+          onClose={handleCloseModal}
+        />
+      )}
     </main>
   );
 }

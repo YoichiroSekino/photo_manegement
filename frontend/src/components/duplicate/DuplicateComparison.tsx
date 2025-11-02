@@ -4,6 +4,8 @@
 
 'use client';
 
+import Image from 'next/image';
+import { usePhoto } from '@/hooks/usePhotos';
 import { Photo } from '@/types/photo';
 
 export interface DuplicatePair {
@@ -28,6 +30,14 @@ export function DuplicateComparison({
 }: DuplicateComparisonProps) {
   const { photo1, photo2, similarityScore, status } = duplicatePair;
 
+  // Fetch full photo details if we only have IDs
+  const { data: photo1Details } = usePhoto(Number(photo1.id));
+  const { data: photo2Details } = usePhoto(Number(photo2.id));
+
+  // Use fetched details if available, otherwise use provided data
+  const fullPhoto1 = photo1Details || photo1;
+  const fullPhoto2 = photo2Details || photo2;
+
   const getSimilarityColor = (score: number) => {
     if (score >= 0.95) return 'text-red-600';
     if (score >= 0.85) return 'text-orange-600';
@@ -43,13 +53,13 @@ export function DuplicateComparison({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-4">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4">
       {/* ヘッダー */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <h3 className="text-lg font-semibold">重複候補</h3>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <h3 className="text-base sm:text-lg font-semibold">重複候補</h3>
           <span
-            className={`font-semibold ${getSimilarityColor(similarityScore)}`}
+            className={`text-sm sm:text-base font-semibold ${getSimilarityColor(similarityScore)}`}
           >
             {getSimilarityLabel(similarityScore)} ({Math.round(similarityScore * 100)}%)
           </span>
@@ -68,10 +78,10 @@ export function DuplicateComparison({
       </div>
 
       {/* サイドバイサイド比較 */}
-      <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
         {/* Photo 1 */}
         <PhotoComparisonCard
-          photo={photo1}
+          photo={fullPhoto1}
           label="写真 1"
           onSelect={() => onConfirm(duplicatePair.id, 'photo1')}
           disabled={status !== 'pending'}
@@ -79,7 +89,7 @@ export function DuplicateComparison({
 
         {/* Photo 2 */}
         <PhotoComparisonCard
-          photo={photo2}
+          photo={fullPhoto2}
           label="写真 2"
           onSelect={() => onConfirm(duplicatePair.id, 'photo2')}
           disabled={status !== 'pending'}
@@ -122,10 +132,13 @@ function PhotoComparisonCard({
       {/* 画像プレビュー */}
       <div className="aspect-video bg-gray-100 relative">
         {photo.s3Url ? (
-          <img
+          <Image
             src={photo.s3Url}
             alt={photo.fileName}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={false}
           />
         ) : (
           <div className="flex items-center justify-center h-full">

@@ -41,6 +41,13 @@ export interface PhotoCategory {
   workDetail?: string; // 細別
 }
 
+export interface QualityIssue {
+  type: string;
+  severity: 'high' | 'medium' | 'low';
+  message: string;
+  recommendation?: string;
+}
+
 export interface PhotoMetadata {
   width: number;
   height: number;
@@ -60,6 +67,10 @@ export interface PhotoMetadata {
     sharpness: number;
     brightness: number;
     contrast: number;
+    score?: number;
+    grade?: 'excellent' | 'good' | 'fair' | 'poor';
+    issues?: string[];
+    recommendations?: string[];
   };
 }
 

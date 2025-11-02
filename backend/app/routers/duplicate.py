@@ -13,8 +13,11 @@ from app.schemas.duplicate import (
     DuplicateGroupResponse,
     DuplicatePhotoInfo,
     CalculateHashResponse,
+    DuplicateActionRequest,
+    DuplicateActionResponse,
 )
 from app.services.duplicate_detection_service import DuplicateDetectionService
+from app.config import settings
 
 router = APIRouter(prefix="/api/v1/photos", tags=["Duplicate Detection"])
 
@@ -123,7 +126,7 @@ async def calculate_hash(photo_id: int, db: Session = Depends(get_db)):
     try:
         # S3から画像ダウンロード
         service = DuplicateDetectionService()
-        s3_bucket = "construction-photos"  # TODO: 環境変数化
+        s3_bucket = settings.S3_BUCKET
         s3_key = photo.s3_key
 
         image_data = service.download_image_from_s3(bucket=s3_bucket, key=s3_key)
@@ -178,3 +181,69 @@ async def get_hash(photo_id: int, db: Session = Depends(get_db)):
     phash = photo.photo_metadata["phash"]
 
     return CalculateHashResponse(photo_id=photo_id, phash=phash, status="exists")
+
+
+@router.post("/duplicates/action", response_model=DuplicateActionResponse)
+async def handle_duplicate_action(
+    request: DuplicateActionRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    重複確定・却下処理
+
+    Args:
+        request: 重複アクションリクエスト
+        db: データベースセッション
+
+    Returns:
+        DuplicateActionResponse: 処理結果
+    """
+    if request.action == "confirm":
+        # 重複確定 - 削除予定の写真を確認
+        photo_to_delete = db.query(Photo).filter(Photo.id == request.photo_id_to_delete).first()
+        photo_to_keep = db.query(Photo).filter(Photo.id == request.photo_id_to_keep).first()
+
+        if not photo_to_delete or not photo_to_keep:
+            raise HTTPException(status_code=404, detail="写真が見つかりません")
+
+        # TODO Phase 4: 実際の削除処理を実装（S3からも削除）
+        # 現時点ではis_duplicateフラグのみ設定
+        if photo_to_delete.photo_metadata is None:
+            photo_to_delete.photo_metadata = {}
+        photo_to_delete.photo_metadata["duplicate_status"] = "confirmed"
+        photo_to_delete.photo_metadata["kept_photo_id"] = request.photo_id_to_keep
+        photo_to_delete.is_duplicate = True
+
+        db.commit()
+
+        return DuplicateActionResponse(
+            status="success",
+            photo_id_kept=request.photo_id_to_keep,
+            photo_id_deleted=request.photo_id_to_delete,
+            message=f"写真ID {request.photo_id_to_delete} を重複として確定しました（削除処理は Phase 4 で実装予定）",
+        )
+
+    elif request.action == "reject":
+        # 重複却下 - フラグをクリア
+        photo1 = db.query(Photo).filter(Photo.id == request.photo_id_to_keep).first()
+        photo2 = db.query(Photo).filter(Photo.id == request.photo_id_to_delete).first()
+
+        if not photo1 or not photo2:
+            raise HTTPException(status_code=404, detail="写真が見つかりません")
+
+        # 重複フラグをクリア
+        for photo in [photo1, photo2]:
+            if photo.photo_metadata is None:
+                photo.photo_metadata = {}
+            photo.photo_metadata["duplicate_status"] = "rejected"
+            photo.is_duplicate = False
+
+        db.commit()
+
+        return DuplicateActionResponse(
+            status="success",
+            message="重複を却下しました",
+        )
+
+    else:
+        raise HTTPException(status_code=400, detail="無効なアクション")

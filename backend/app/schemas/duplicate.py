@@ -48,3 +48,20 @@ class CalculateHashResponse(BaseModel):
     photo_id: int = Field(..., description="写真ID")
     phash: str = Field(..., description="計算されたpHash")
     status: str = Field(..., description="処理ステータス")
+
+
+class DuplicateActionRequest(BaseModel):
+    """重複確定・却下リクエスト"""
+
+    photo_id_to_keep: int = Field(..., description="保持する写真ID")
+    photo_id_to_delete: int = Field(..., description="削除する写真ID")
+    action: str = Field(..., description="アクション (confirm/reject)")
+
+
+class DuplicateActionResponse(BaseModel):
+    """重複確定・却下レスポンス"""
+
+    status: str = Field(..., description="処理ステータス")
+    photo_id_kept: Optional[int] = Field(None, description="保持された写真ID")
+    photo_id_deleted: Optional[int] = Field(None, description="削除された写真ID")
+    message: str = Field(..., description="メッセージ")

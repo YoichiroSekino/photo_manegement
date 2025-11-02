@@ -11,6 +11,7 @@ from app.database.database import get_db
 from app.database.models import Photo, User
 from app.services.ocr_service import OCRService, BlackboardData
 from app.auth.dependencies import get_current_active_user
+from app.config import settings
 
 router = APIRouter(prefix="/api/v1/photos", tags=["ocr"])
 
@@ -76,8 +77,8 @@ async def process_ocr(
     # OCRサービスを使用してテキスト抽出
     ocr_service = OCRService()
 
-    # S3キーからバケット名とキーを分離（実際の実装では環境変数から取得）
-    s3_bucket = "construction-photos"  # TODO: 環境変数から取得
+    # S3キーからバケット名とキーを分離
+    s3_bucket = settings.S3_BUCKET
     s3_key = photo.s3_key
 
     try:

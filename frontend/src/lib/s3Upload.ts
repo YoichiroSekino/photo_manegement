@@ -249,7 +249,8 @@ export class PresignedUploader {
   static async uploadWithPresignedUrl(
     file: File,
     getPresignedUrlEndpoint: string,
-    onProgress?: (progress: UploadProgress) => void
+    onProgress?: (progress: UploadProgress) => void,
+    authToken?: string
   ): Promise<UploadResult> {
     let uploadedSize = 0;
 
@@ -269,11 +270,16 @@ export class PresignedUploader {
       updateProgress('uploading');
 
       // 1. バックエンドからPresigned URLを取得
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch(getPresignedUrlEndpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({
           fileName: file.name,
           fileSize: file.size,
@@ -322,7 +328,8 @@ export class PresignedUploader {
     files: File[],
     getPresignedUrlEndpoint: string,
     onProgress?: (fileName: string, progress: UploadProgress) => void,
-    maxConcurrent: number = 10
+    maxConcurrent: number = 10,
+    authToken?: string
   ): Promise<UploadResult[]> {
     const results: UploadResult[] = [];
 
@@ -332,7 +339,7 @@ export class PresignedUploader {
         batch.map((file) =>
           this.uploadWithPresignedUrl(file, getPresignedUrlEndpoint, (progress) => {
             onProgress?.(file.name, progress);
-          })
+          }, authToken)
         )
       );
       results.push(...batchResults);

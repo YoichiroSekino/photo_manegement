@@ -21,6 +21,7 @@ from app.routers import (
     export,
     photo_album,
     auth,
+    organizations,
 )
 from app.middleware import TenantIdentificationMiddleware
 
@@ -52,6 +53,7 @@ app.add_middleware(
 
 # ルーター登録（順序重要: 具体的なパスを先に登録）
 app.include_router(auth.router)  # /api/v1/auth
+app.include_router(organizations.router)  # /api/v1/organizations
 app.include_router(photo_album.router)  # /api/v1/photo-album/generate-pdf
 app.include_router(export.router)  # /api/v1/export/package
 app.include_router(photo_xml.router)  # /api/v1/photo-xml/generate

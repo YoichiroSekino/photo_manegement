@@ -11,10 +11,19 @@ interface User {
   email: string;
   full_name: string | null;
   is_active: boolean;
+  organization_id: number;
+}
+
+interface Organization {
+  id: number;
+  name: string;
+  subdomain: string;
+  is_active: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
+  organization: Organization | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -26,6 +35,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -49,6 +59,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
+
+          // 組織情報も取得
+          if (userData.organization_id) {
+            const orgResponse = await fetch(`${apiEndpoint}/api/v1/organizations/${userData.organization_id}`, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            });
+            if (orgResponse.ok) {
+              const orgData = await orgResponse.json();
+              setOrganization(orgData);
+            }
+          }
         } else {
           // トークンが無効な場合はクリア
           localStorage.removeItem('access_token');
@@ -94,6 +117,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (userResponse.ok) {
       const userData = await userResponse.json();
       setUser(userData);
+
+      // 組織情報も取得
+      if (userData.organization_id) {
+        const orgResponse = await fetch(`${apiEndpoint}/api/v1/organizations/${userData.organization_id}`, {
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+          },
+        });
+        if (orgResponse.ok) {
+          const orgData = await orgResponse.json();
+          setOrganization(orgData);
+        }
+      }
     }
   };
 
@@ -123,10 +159,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     setUser(null);
+    setOrganization(null);
   };
 
   const value: AuthContextType = {
     user,
+    organization,
     isAuthenticated: !!user,
     isLoading,
     login,

@@ -1,42 +1,70 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { PhotoGrid } from '@/components/photos/PhotoGrid';
-import { usePhotos } from '@/hooks/usePhotos';
+import { PhotoDetailModal } from '@/components/photos/PhotoDetailModal';
+import { PhotoMap } from '@/components/map/PhotoMap';
+import { usePhotos, usePhoto } from '@/hooks/usePhotos';
 import { useUIStore } from '@/store/uiStore';
 import { useFilterStore } from '@/store/filterStore';
 
 export default function PhotosPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'map'>('grid');
+  const pageSize = 20;
+
+  // 認証チェック
+  if (!authLoading && !isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
+
   // React Queryでデータ取得
   const filters = useFilterStore((state) => state.filters);
-  const { data: photos = [], isLoading, error } = usePhotos(filters);
+  const { data, isLoading, error } = usePhotos({ ...filters, page: currentPage, page_size: pageSize });
+  const photos = data?.photos || [];
+  const totalPages = data?.total_pages || 0;
+  const totalCount = data?.total || 0;
+
+  // 選択された写真の詳細を取得
+  const { data: selectedPhoto } = usePhoto(selectedPhotoId);
 
   // UI状態管理
   const { viewMode, setViewMode, sortField, sortOrder, setSorting } =
     useUIStore();
 
   const handlePhotoSelect = (id: string) => {
-    console.log('Selected photo:', id);
-    // TODO: 写真詳細ページへ遷移またはモーダル表示
+    setSelectedPhotoId(Number(id));
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPhotoId(null);
   };
 
   return (
-    <main className="flex min-h-screen flex-col p-8">
+    <main className="flex min-h-screen flex-col p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">写真一覧</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">写真一覧</h1>
+            <p className="text-sm sm:text-base text-gray-600">
               アップロードされた工事写真を閲覧・管理できます
             </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            {/* View mode toggle */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            {/* Display mode toggle */}
             <div className="flex items-center space-x-2 border rounded-lg p-1">
               <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                onClick={() => setDisplayMode('grid')}
+                className={`p-2 rounded ${displayMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
                 aria-label="Grid view"
+                title="グリッド表示"
               >
                 <svg
                   className="w-5 h-5"
@@ -53,9 +81,10 @@ export default function PhotosPage() {
                 </svg>
               </button>
               <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
-                aria-label="List view"
+                onClick={() => setDisplayMode('map')}
+                className={`p-2 rounded ${displayMode === 'map' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+                aria-label="Map view"
+                title="地図表示"
               >
                 <svg
                   className="w-5 h-5"
@@ -67,7 +96,7 @@ export default function PhotosPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
                   />
                 </svg>
               </button>
@@ -92,7 +121,7 @@ export default function PhotosPage() {
             </select>
 
             <span className="text-sm text-gray-500">
-              {photos.length} 件の写真
+              {totalCount} 件の写真
             </span>
           </div>
         </div>
@@ -110,10 +139,86 @@ export default function PhotosPage() {
           </div>
         )}
 
-        {!isLoading && !error && (
-          <PhotoGrid photos={photos} onPhotoSelect={handlePhotoSelect} />
+        {!isLoading && !error && photos.length === 0 && (
+          <div className="text-center py-12">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="mt-4 text-gray-600">写真がアップロードされていません</p>
+            <button
+              onClick={() => router.push('/upload')}
+              className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+            >
+              写真をアップロードする →
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !error && photos.length > 0 && (
+          <>
+            {/* Display based on mode */}
+            {displayMode === 'grid' ? (
+              <PhotoGrid photos={photos} onPhotoSelect={handlePhotoSelect} />
+            ) : (
+              <PhotoMap photos={photos} onPhotoSelect={handlePhotoSelect} />
+            )}
+
+            {/* Pagination - only for grid view */}
+            {displayMode === 'grid' && totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  前へ
+                </button>
+
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 7) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 4) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 3) {
+                      pageNum = totalPages - 6 + i;
+                    } else {
+                      pageNum = currentPage - 3 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`px-3 py-1 rounded ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  次へ
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Photo Detail Modal */}
+      {selectedPhoto && (
+        <PhotoDetailModal
+          photo={selectedPhoto}
+          onClose={handleCloseModal}
+        />
+      )}
     </main>
   );
 }

@@ -14,6 +14,7 @@ from app.schemas.rekognition import (
 )
 from app.services.rekognition_service import RekognitionService
 from app.auth.dependencies import get_current_active_user
+from app.config import settings
 
 router = APIRouter(prefix="/api/v1/photos", tags=["Rekognition"])
 
@@ -54,8 +55,8 @@ async def classify_image(
     # Rekognitionサービス初期化
     rekognition_service = RekognitionService(confidence_threshold=70.0)
 
-    # S3情報取得（実際の環境では環境変数から）
-    s3_bucket = "construction-photos"  # TODO: 環境変数化
+    # S3情報取得
+    s3_bucket = settings.S3_BUCKET
     s3_key = photo.s3_key
 
     try:
