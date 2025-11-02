@@ -22,6 +22,11 @@ from app.schemas.duplicate import (
     DuplicateDetectionResponse,
     CalculateHashResponse,
 )
+from app.schemas.quality import (
+    QualityMetrics,
+    QualityAssessmentResponse,
+    QualityCheckResponse,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -39,4 +44,7 @@ __all__ = [
     "DuplicateGroupResponse",
     "DuplicateDetectionResponse",
     "CalculateHashResponse",
+    "QualityMetrics",
+    "QualityAssessmentResponse",
+    "QualityCheckResponse",
 ]

@@ -39,7 +39,13 @@
       "Bash(./venv/Scripts/pytest tests/test_debug_search.py -v -s)",
       "Bash(./venv/Scripts/pytest tests/test_rekognition_service.py -v)",
       "Bash(./venv/Scripts/pytest tests/test_api_rekognition.py -v)",
-      "Bash(./venv/Scripts/pytest tests/test_duplicate_detection_service.py -v)"
+      "Bash(./venv/Scripts/pytest tests/test_duplicate_detection_service.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_quality_assessment_service.py -v)",
+      "Bash(timeout 60 bash:*)",
+      "Bash(while ! ./venv/Scripts/python -c \"import cv2\")",
+      "Bash(do sleep 3)",
+      "Bash(done)",
+      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing)"
     ],
     "deny": [],
     "ask": []
