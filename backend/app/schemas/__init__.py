@@ -37,6 +37,12 @@ from app.schemas.photo_xml import (
     PhotoXMLGenerationResponse,
     PhotoXMLValidationResponse,
 )
+from app.schemas.export import (
+    ExportRequest,
+    ExportResponse,
+    ExportValidationResponse,
+    FileRenameInfo,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -63,4 +69,8 @@ __all__ = [
     "PhotoXMLGenerationRequest",
     "PhotoXMLGenerationResponse",
     "PhotoXMLValidationResponse",
+    "ExportRequest",
+    "ExportResponse",
+    "ExportValidationResponse",
+    "FileRenameInfo",
 ]

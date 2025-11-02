@@ -1,0 +1,32 @@
+<!-- デジタル写真管理情報基準（案） PHOTO05.DTD -->
+<!-- 土木工事 -->
+
+<!ELEMENT photodata (基礎情報,写真情報+)>
+<!ATTLIST photodata DTD_version CDATA #FIXED "05">
+
+<!ELEMENT 基礎情報 (写真フォルダ名,適用要領基準,工事件名?,工事番号?)>
+<!ELEMENT 写真フォルダ名 (#PCDATA)>
+<!ELEMENT 適用要領基準 (#PCDATA)>
+<!ELEMENT 工事件名 (#PCDATA)>
+<!ELEMENT 工事番号 (#PCDATA)>
+
+<!ELEMENT 写真情報 (写真ファイル情報,撮影工種区分?,撮影情報)>
+
+<!ELEMENT 写真ファイル情報 (シリアル番号,写真ファイル名)>
+<!ELEMENT シリアル番号 (#PCDATA)>
+<!ELEMENT 写真ファイル名 (#PCDATA)>
+
+<!ELEMENT 撮影工種区分 (工種,種別?,細別?)>
+<!ELEMENT 工種 (#PCDATA)>
+<!ELEMENT 種別 (#PCDATA)>
+<!ELEMENT 細別 (#PCDATA)>
+
+<!ELEMENT 撮影情報 (写真タイトル,撮影年月日?,写真区分?,工事名?,測点?,設計寸法?,実測寸法?,検査員?)>
+<!ELEMENT 写真タイトル (#PCDATA)>
+<!ELEMENT 撮影年月日 (#PCDATA)>
+<!ELEMENT 写真区分 (#PCDATA)>
+<!ELEMENT 工事名 (#PCDATA)>
+<!ELEMENT 測点 (#PCDATA)>
+<!ELEMENT 設計寸法 (#PCDATA)>
+<!ELEMENT 実測寸法 (#PCDATA)>
+<!ELEMENT 検査員 (#PCDATA)>
