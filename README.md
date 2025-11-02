@@ -1,16 +1,16 @@
 # 工事写真自動整理システム (Construction Photo Management System)
 
-**Phase 3 電子納品対応完成！** 🎉 (v0.4.0 - 2025-11-02)
+**Phase 3 完全完了！** 🎉 (v0.5.0 - 2025-11-02)
 
-[![Tests](https://img.shields.io/badge/tests-119%20passed-success)](./backend/tests)
-[![Coverage](https://img.shields.io/badge/coverage-82%25-brightgreen)](./backend/htmlcov)
+[![Tests](https://img.shields.io/badge/tests-135%20passed-success)](./backend/tests)
+[![Coverage](https://img.shields.io/badge/coverage-83%25-brightgreen)](./backend/htmlcov)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![AWS](https://img.shields.io/badge/AWS-Rekognition-orange)](https://aws.amazon.com/rekognition/)
 
-> **最新情報**: Phase 3 電子納品対応が完成！PHOTO.XML自動生成とZIPエクスポート機能を実装し、国土交通省のデジタル写真管理情報基準（PHOTO05.DTD）に完全準拠した電子納品パッケージが自動生成できるようになりました。詳細は [PHASE3_MONTH7-8_RELEASE.md](./PHASE3_MONTH7-8_RELEASE.md) をご覧ください。
+> **最新情報**: Phase 3 完全完了！工事写真帳PDF自動生成機能を追加し、電子納品対応の全機能（PHOTO.XML生成、ZIPエクスポート、PDF写真帳生成）が完成しました。3種類のレイアウトタイプ（標準・コンパクト・詳細）で柔軟なPDF生成が可能です。詳細は [PHASE3_MONTH9_RELEASE.md](./PHASE3_MONTH9_RELEASE.md) をご覧ください。
 
 ## 🚀 クイックスタート
 
@@ -54,13 +54,13 @@ cd frontend && npm install && npm run dev
 | ✅ 画質判定 | 完了 | 13/13 | 91% |
 | ✅ 自動タイトル生成 | 完了 | 16/16 | 92% |
 
-### Phase 3 電子納品対応（進行中）
+### Phase 3 電子納品対応（完了）
 
 | 機能 | ステータス | テスト | カバレッジ |
 |------|-----------|--------|-----------|
 | ✅ PHOTO.XML生成 | **完了** | 16/16 | 92% |
 | ✅ ファイル管理・エクスポート | **完了** | 17/17 | 89% |
-| 🔄 工事写真帳生成 | 未着手 | - | - |
+| ✅ 工事写真帳生成 | **完了** | 16/16 | 95% |
 
 ## 開発方針
 - 最重要：ドキュメントやGithubのコメントは日本語を使う
