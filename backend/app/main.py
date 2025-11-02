@@ -5,7 +5,7 @@ FastAPI メインアプリケーション
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
-from app.routers import photos, ocr, search, rekognition, duplicate, quality
+from app.routers import photos, ocr, search, rekognition, duplicate, quality, title
 
 # FastAPIアプリケーション初期化
 app = FastAPI(
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(search.router)  # /api/v1/photos/search
 app.include_router(duplicate.router)  # /api/v1/photos/detect-duplicates
 app.include_router(quality.router)  # /api/v1/photos/{photo_id}/assess-quality
+app.include_router(title.router)  # /api/v1/photos/{photo_id}/generate-title
 app.include_router(rekognition.router)  # /api/v1/photos/{photo_id}/classify
 app.include_router(ocr.router)  # /api/v1/photos/{photo_id}/process-ocr
 app.include_router(photos.router)  # /api/v1/photos/{photo_id}

@@ -27,6 +27,11 @@ from app.schemas.quality import (
     QualityAssessmentResponse,
     QualityCheckResponse,
 )
+from app.schemas.title import (
+    TitleGenerationRequest,
+    TitleGenerationResponse,
+    TitleUpdateRequest,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -47,4 +52,7 @@ __all__ = [
     "QualityMetrics",
     "QualityAssessmentResponse",
     "QualityCheckResponse",
+    "TitleGenerationRequest",
+    "TitleGenerationResponse",
+    "TitleUpdateRequest",
 ]

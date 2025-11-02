@@ -45,7 +45,8 @@
       "Bash(while ! ./venv/Scripts/python -c \"import cv2\")",
       "Bash(do sleep 3)",
       "Bash(done)",
-      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing)"
+      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing)",
+      "Bash(./venv/Scripts/pytest tests/test_title_generation_service.py -v)"
     ],
     "deny": [],
     "ask": []
