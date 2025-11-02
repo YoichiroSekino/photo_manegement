@@ -3,11 +3,18 @@
 import { useState, useCallback } from 'react';
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import { validateFiles, getValidFiles, getErrorMessages } from '@/lib/fileValidator';
+import { PresignedUploader, UploadProgress } from '@/lib/s3Upload';
+
+interface FileUploadStatus {
+  file: File;
+  progress: UploadProgress;
+}
 
 export default function UploadPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatuses, setUploadStatuses] = useState<Map<string, FileUploadStatus>>(new Map());
 
   const handleFilesSelected = useCallback((files: File[]) => {
     // ファイルバリデーション
@@ -17,18 +24,62 @@ export default function UploadPage() {
 
     setSelectedFiles(validFiles);
     setErrors(errorMessages);
+
+    // アップロード状態をリセット
+    setUploadStatuses(new Map());
   }, []);
 
   const handleUpload = useCallback(async () => {
     if (selectedFiles.length === 0) return;
 
     setIsUploading(true);
+    setErrors([]);
+
+    const statuses = new Map<string, FileUploadStatus>();
+    selectedFiles.forEach((file) => {
+      statuses.set(file.name, {
+        file,
+        progress: {
+          fileName: file.name,
+          loaded: 0,
+          total: file.size,
+          percentage: 0,
+          status: 'pending',
+        },
+      });
+    });
+    setUploadStatuses(new Map(statuses));
+
     try {
-      // TODO: S3アップロード実装
-      console.log('Uploading files:', selectedFiles);
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬アップロード
+      const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const uploadEndpoint = `${apiEndpoint}/api/v1/photos/upload`;
+
+      await PresignedUploader.uploadMultipleWithPresignedUrl(
+        selectedFiles,
+        uploadEndpoint,
+        (fileName, progress) => {
+          setUploadStatuses((prev) => {
+            const newStatuses = new Map(prev);
+            const status = newStatuses.get(fileName);
+            if (status) {
+              status.progress = progress;
+              newStatuses.set(fileName, { ...status });
+            }
+            return newStatuses;
+          });
+        },
+        5 // 最大5並列
+      );
+
+      // アップロード成功
+      console.log('All files uploaded successfully');
+      setTimeout(() => {
+        setSelectedFiles([]);
+        setUploadStatuses(new Map());
+      }, 2000);
     } catch (error) {
       console.error('Upload error:', error);
+      setErrors(['アップロード中にエラーが発生しました。もう一度お試しください。']);
     } finally {
       setIsUploading(false);
     }
@@ -64,36 +115,95 @@ export default function UploadPage() {
             </h2>
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <ul className="divide-y divide-gray-200">
-                {selectedFiles.map((file, index) => (
-                  <li
-                    key={index}
-                    className="px-4 py-3 flex items-center justify-between hover:bg-gray-50"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <svg
-                        className="w-8 h-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
+                {selectedFiles.map((file, index) => {
+                  const status = uploadStatuses.get(file.name);
+                  const progress = status?.progress;
+
+                  return (
+                    <li
+                      key={index}
+                      className="px-4 py-3 hover:bg-gray-50"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <svg
+                            className="w-8 h-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                        {progress && (
+                          <div className="ml-4 flex items-center space-x-2">
+                            {progress.status === 'uploading' && (
+                              <span className="text-sm text-blue-600">
+                                {progress.percentage}%
+                              </span>
+                            )}
+                            {progress.status === 'completed' && (
+                              <svg
+                                className="w-5 h-5 text-green-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                            {progress.status === 'error' && (
+                              <svg
+                                className="w-5 h-5 text-red-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </li>
-                ))}
+                      {progress && progress.status === 'uploading' && (
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${progress.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {progress && progress.status === 'error' && progress.error && (
+                        <p className="mt-1 text-xs text-red-600">{progress.error}</p>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 

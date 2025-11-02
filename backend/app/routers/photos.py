@@ -5,12 +5,93 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+import boto3
+from botocore.exceptions import ClientError
+from datetime import datetime
+import os
 
 from app.database.database import get_db
 from app.database.models import Photo
 from app.schemas.photo import PhotoCreate, PhotoResponse, PhotoListResponse
 
 router = APIRouter(prefix="/api/v1/photos", tags=["photos"])
+
+
+class PresignedUrlRequest(BaseModel):
+    """Presigned URL リクエスト"""
+    fileName: str
+    fileSize: int
+    mimeType: str
+
+
+class PresignedUrlResponse(BaseModel):
+    """Presigned URL レスポンス"""
+    presignedUrl: str
+    key: str
+    bucket: str
+    expiresIn: int
+
+
+@router.post("/upload", response_model=PresignedUrlResponse)
+async def generate_presigned_url(request: PresignedUrlRequest):
+    """
+    S3アップロード用のPresigned URLを生成する
+
+    Args:
+        request: ファイル情報
+
+    Returns:
+        Presigned URLとメタデータ
+
+    Raises:
+        HTTPException: Presigned URL生成に失敗した場合
+    """
+    try:
+        # S3クライアント初期化
+        s3_client = boto3.client(
+            "s3",
+            region_name=os.getenv("AWS_REGION", "ap-northeast-1"),
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        )
+
+        bucket_name = os.getenv("S3_BUCKET_NAME", "construction-photos-dev")
+
+        # S3キーを生成（タイムスタンプ + ファイル名）
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_extension = request.fileName.split(".")[-1] if "." in request.fileName else ""
+        s3_key = f"photos/{timestamp}_{request.fileName}"
+
+        # Presigned URL生成（有効期限: 15分）
+        expires_in = 900  # 15分
+        presigned_url = s3_client.generate_presigned_url(
+            "put_object",
+            Params={
+                "Bucket": bucket_name,
+                "Key": s3_key,
+                "ContentType": request.mimeType,
+            },
+            ExpiresIn=expires_in,
+        )
+
+        return PresignedUrlResponse(
+            presignedUrl=presigned_url,
+            key=s3_key,
+            bucket=bucket_name,
+            expiresIn=expires_in,
+        )
+
+    except ClientError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Presigned URL生成に失敗しました: {str(e)}",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"予期しないエラーが発生しました: {str(e)}",
+        )
 
 
 @router.post("", response_model=PhotoResponse, status_code=status.HTTP_201_CREATED)
