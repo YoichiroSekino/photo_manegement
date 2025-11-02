@@ -20,9 +20,7 @@ class PhotoXMLGenerator:
         self.photo_folder = "PHOTO/PIC"
         self.standard = "土木202303-01"
 
-    def generate_xml(
-        self, photos: List[Dict], pretty_print: bool = False
-    ) -> str:
+    def generate_xml(self, photos: List[Dict], pretty_print: bool = False) -> str:
         """
         PHOTO.XMLを生成
 
@@ -173,7 +171,13 @@ class PhotoXMLGenerator:
         errors = []
 
         # 必須項目チェック
-        required_fields = ["id", "file_name", "title", "shooting_date", "major_category"]
+        required_fields = [
+            "id",
+            "file_name",
+            "title",
+            "shooting_date",
+            "major_category",
+        ]
         for field in required_fields:
             if not photo.get(field):
                 errors.append(f"必須項目 '{field}' が不足しています")

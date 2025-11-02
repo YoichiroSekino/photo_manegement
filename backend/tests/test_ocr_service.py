@@ -150,7 +150,10 @@ def test_confidence_threshold():
     """信頼度閾値のテスト"""
     text_blocks = [
         {"text": "工種：土工", "confidence": 95.0},  # 高信頼度
-        {"text": "不明なテキスト", "confidence": 60.0},  # 低信頼度（デフォルト閾値70未満）
+        {
+            "text": "不明なテキスト",
+            "confidence": 60.0,
+        },  # 低信頼度（デフォルト閾値70未満）
     ]
 
     service = OCRService(confidence_threshold=70.0)

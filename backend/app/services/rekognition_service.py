@@ -105,7 +105,9 @@ class RekognitionService:
 
         return labels
 
-    def categorize_construction_labels(self, labels: List[Dict]) -> Dict[str, List[str]]:
+    def categorize_construction_labels(
+        self, labels: List[Dict]
+    ) -> Dict[str, List[str]]:
         """
         建設関連ラベルをカテゴリ分類
 

@@ -181,3 +181,15 @@ class TestRekognitionService:
         summary = rekognition_service.create_image_label_summary(labels)
 
         assert summary["has_construction_content"] is False
+
+    def test_create_image_label_summary_empty_labels(self, rekognition_service):
+        """ラベルが空の場合のサマリー作成テスト"""
+        labels = []
+
+        summary = rekognition_service.create_image_label_summary(labels)
+
+        assert summary["total_labels"] == 0
+        assert summary["max_confidence"] == 0.0
+        assert summary["avg_confidence"] == 0.0
+        assert summary["top_labels"] == []
+        assert summary["has_construction_content"] is False

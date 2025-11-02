@@ -24,7 +24,12 @@ class QualityAssessmentService:
         # 品質判定の閾値
         self.thresholds = {
             "sharpness": {"excellent": 300, "good": 150, "fair": 50},
-            "brightness": {"min": 50, "max": 220, "optimal_min": 80, "optimal_max": 180},
+            "brightness": {
+                "min": 50,
+                "max": 220,
+                "optimal_min": 80,
+                "optimal_max": 180,
+            },
             "contrast": {"excellent": 60, "good": 40, "fair": 20},
         }
 
@@ -181,9 +186,13 @@ class QualityAssessmentService:
 
         for issue in issues:
             if "ぼやけ" in issue or "ブレ" in issue:
-                recommendations.append("再撮影してください（手ブレ防止、三脚使用を推奨）")
+                recommendations.append(
+                    "再撮影してください（手ブレ防止、三脚使用を推奨）"
+                )
             elif "暗すぎ" in issue:
-                recommendations.append("明るい場所で撮影するか、フラッシュを使用してください")
+                recommendations.append(
+                    "明るい場所で撮影するか、フラッシュを使用してください"
+                )
             elif "明るすぎ" in issue:
                 recommendations.append("露出を下げるか、逆光を避けて撮影してください")
             elif "やや暗い" in issue:
@@ -235,9 +244,11 @@ class QualityAssessmentService:
         optimal_max = self.thresholds["brightness"]["optimal_max"]
         if optimal_min <= brightness <= optimal_max:
             brightness_score = 30
-        elif self.thresholds["brightness"]["min"] <= brightness <= self.thresholds[
-            "brightness"
-        ]["max"]:
+        elif (
+            self.thresholds["brightness"]["min"]
+            <= brightness
+            <= self.thresholds["brightness"]["max"]
+        ):
             brightness_score = 20
         else:
             brightness_score = 10

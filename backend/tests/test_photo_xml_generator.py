@@ -66,7 +66,7 @@ class TestPhotoXMLGenerator:
         assert isinstance(xml_string, str)
         assert '<?xml version="1.0" encoding="Shift_JIS"?>' in xml_string
         assert "<!DOCTYPE photodata SYSTEM" in xml_string
-        assert "<photodata DTD_version=\"05\">" in xml_string
+        assert '<photodata DTD_version="05">' in xml_string
         assert "<基礎情報>" in xml_string
         assert "<写真情報>" in xml_string
 
@@ -217,9 +217,7 @@ class TestPhotoXMLGenerator:
     def test_check_work_category_rules(self, xml_generator):
         """工種区分記入可否ルールテスト"""
         # 着手前及び完成写真：工種記入不要
-        assert (
-            xml_generator.check_work_category_required("着手前及び完成写真") == False
-        )
+        assert xml_generator.check_work_category_required("着手前及び完成写真") == False
 
         # 品質管理写真：工種記入必須
         assert xml_generator.check_work_category_required("品質管理写真") == True

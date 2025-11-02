@@ -9,9 +9,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_, func
 
 from app.database.database import get_db
-from app.database.models import Photo
+from app.database.models import Photo, User
 from app.schemas.search import SearchResponse
 from app.schemas.photo import PhotoResponse
+from app.auth.dependencies import get_current_active_user
 
 router = APIRouter(prefix="/api/v1/photos", tags=["search"])
 
@@ -28,9 +29,10 @@ async def search_photos(
     page: int = Query(1, ge=1, description="ページ番号"),
     page_size: int = Query(20, ge=1, le=100, description="ページサイズ"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
-    写真を検索
+    写真を検索（マルチテナント対応）
 
     Args:
         keyword: キーワード（ファイル名、タイトル、説明から検索）
@@ -43,21 +45,39 @@ async def search_photos(
         page: ページ番号
         page_size: ページサイズ
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        検索結果
+        検索結果（自組織のみ）
     """
-    query = db.query(Photo)
+    # テナントフィルタを適用
+    query = db.query(Photo).filter(
+        Photo.organization_id == current_user.organization_id
+    )
 
     # キーワード検索（全文検索）
     if keyword:
-        # TSVectorを使った全文検索（高速）
-        ts_query = func.plainto_tsquery('simple', keyword)
-        query = query.filter(Photo.search_vector.op('@@')(ts_query))
-        # 関連度順にソート
-        query = query.order_by(
-            func.ts_rank(Photo.search_vector, ts_query).desc()
-        )
+        # データベースの種類を判定
+        db_dialect = db.bind.dialect.name
+
+        if db_dialect == "postgresql":
+            # PostgreSQL: TSVectorを使った全文検索（高速）
+            ts_query = func.plainto_tsquery("simple", keyword)
+            query = query.filter(Photo.search_vector.op("@@")(ts_query))
+            # 関連度順にソート
+            query = query.order_by(func.ts_rank(Photo.search_vector, ts_query).desc())
+        else:
+            # SQLite/その他: LIKE検索にフォールバック
+            search_pattern = f"%{keyword}%"
+            query = query.filter(
+                or_(
+                    Photo.file_name.like(search_pattern),
+                    Photo.title.like(search_pattern),
+                    Photo.description.like(search_pattern),
+                    Photo.work_type.like(search_pattern),
+                    Photo.work_kind.like(search_pattern),
+                )
+            )
 
     # 工種フィルタ
     if work_type:

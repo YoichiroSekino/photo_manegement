@@ -82,9 +82,7 @@ class TestQualityAssessmentService:
         # チェッカーパターンはエッジが多いので高いシャープネス値
         assert sharpness > 100.0
 
-    def test_calculate_sharpness_blurry_image(
-        self, quality_service, test_image_blurry
-    ):
+    def test_calculate_sharpness_blurry_image(self, quality_service, test_image_blurry):
         """ぼやけた画像のシャープネス計算テスト"""
         sharpness = quality_service.calculate_sharpness(test_image_blurry)
         assert isinstance(sharpness, float)

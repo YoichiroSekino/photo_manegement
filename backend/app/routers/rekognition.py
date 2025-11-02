@@ -6,34 +6,46 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.database.models import Photo
+from app.database.models import Photo, User
 from app.schemas.rekognition import (
     ClassificationResponse,
     ClassificationResultResponse,
     ImageLabelResponse,
 )
 from app.services.rekognition_service import RekognitionService
+from app.auth.dependencies import get_current_active_user
 
 router = APIRouter(prefix="/api/v1/photos", tags=["Rekognition"])
 
 
 @router.post("/{photo_id}/classify", response_model=ClassificationResponse)
-async def classify_image(photo_id: int, db: Session = Depends(get_db)):
+async def classify_image(
+    photo_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """
-    画像分類を実行
+    画像分類を実行（マルチテナント対応）
 
     Args:
         photo_id: 写真ID
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        ClassificationResponse: 分類結果
+        ClassificationResponse: 分類結果（自組織のみ）
 
     Raises:
-        HTTPException: 写真が見つからない場合
+        HTTPException: 写真が見つからない、または他組織の写真の場合
     """
-    # 写真取得
-    photo = db.query(Photo).filter(Photo.id == photo_id).first()
+    # 写真取得（テナントフィルタ適用）
+    photo = (
+        db.query(Photo)
+        .filter(
+            Photo.id == photo_id, Photo.organization_id == current_user.organization_id
+        )
+        .first()
+    )
     if photo is None:
         raise HTTPException(
             status_code=404, detail=f"写真が見つかりません（ID: {photo_id}）"
@@ -98,35 +110,41 @@ async def classify_image(photo_id: int, db: Session = Depends(get_db)):
         )
 
 
-@router.get(
-    "/{photo_id}/classification", response_model=ClassificationResultResponse
-)
-async def get_classification_result(photo_id: int, db: Session = Depends(get_db)):
+@router.get("/{photo_id}/classification", response_model=ClassificationResultResponse)
+async def get_classification_result(
+    photo_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """
-    画像分類結果を取得
+    画像分類結果を取得（マルチテナント対応）
 
     Args:
         photo_id: 写真ID
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        ClassificationResultResponse: 分類結果
+        ClassificationResultResponse: 分類結果（自組織のみ）
 
     Raises:
-        HTTPException: 写真が見つからない場合
+        HTTPException: 写真が見つからない、または他組織の写真の場合
     """
-    # 写真取得
-    photo = db.query(Photo).filter(Photo.id == photo_id).first()
+    # 写真取得（テナントフィルタ適用）
+    photo = (
+        db.query(Photo)
+        .filter(
+            Photo.id == photo_id, Photo.organization_id == current_user.organization_id
+        )
+        .first()
+    )
     if photo is None:
         raise HTTPException(
             status_code=404, detail=f"写真が見つかりません（ID: {photo_id}）"
         )
 
     # メタデータから分類結果取得
-    if (
-        photo.photo_metadata is None
-        or "rekognition_labels" not in photo.photo_metadata
-    ):
+    if photo.photo_metadata is None or "rekognition_labels" not in photo.photo_metadata:
         # 未処理
         return ClassificationResultResponse(
             photo_id=photo_id, status="not_processed", labels=[]

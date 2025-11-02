@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from app.database.database import get_db
-from app.database.models import Photo
+from app.database.models import Photo, User
 from app.services.ocr_service import OCRService, BlackboardData
+from app.auth.dependencies import get_current_active_user
 
 router = APIRouter(prefix="/api/v1/photos", tags=["ocr"])
 
@@ -38,22 +39,33 @@ class OCRResultResponse(BaseModel):
 
 
 @router.post("/{photo_id}/process-ocr", response_model=OCRProcessResponse)
-async def process_ocr(photo_id: int, db: Session = Depends(get_db)):
+async def process_ocr(
+    photo_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """
-    写真のOCR処理を実行
+    写真のOCR処理を実行（マルチテナント対応）
 
     Args:
         photo_id: 写真ID
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        OCR処理結果
+        OCR処理結果（自組織のみ）
 
     Raises:
-        HTTPException: 写真が見つからない場合
+        HTTPException: 写真が見つからない、または他組織の写真の場合
     """
-    # 写真を取得
-    photo = db.query(Photo).filter(Photo.id == photo_id).first()
+    # 写真を取得（テナントフィルタ適用）
+    photo = (
+        db.query(Photo)
+        .filter(
+            Photo.id == photo_id, Photo.organization_id == current_user.organization_id
+        )
+        .first()
+    )
 
     if photo is None:
         raise HTTPException(
@@ -113,22 +125,33 @@ async def process_ocr(photo_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{photo_id}/ocr-result", response_model=OCRResultResponse)
-async def get_ocr_result(photo_id: int, db: Session = Depends(get_db)):
+async def get_ocr_result(
+    photo_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
     """
-    写真のOCR結果を取得
+    写真のOCR結果を取得（マルチテナント対応）
 
     Args:
         photo_id: 写真ID
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        OCR結果
+        OCR結果（自組織のみ）
 
     Raises:
-        HTTPException: 写真が見つからない場合
+        HTTPException: 写真が見つからない、または他組織の写真の場合
     """
-    # 写真を取得
-    photo = db.query(Photo).filter(Photo.id == photo_id).first()
+    # 写真を取得（テナントフィルタ適用）
+    photo = (
+        db.query(Photo)
+        .filter(
+            Photo.id == photo_id, Photo.organization_id == current_user.organization_id
+        )
+        .first()
+    )
 
     if photo is None:
         raise HTTPException(

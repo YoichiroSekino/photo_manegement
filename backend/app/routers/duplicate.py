@@ -139,9 +139,7 @@ async def calculate_hash(photo_id: int, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(photo)
 
-        return CalculateHashResponse(
-            photo_id=photo_id, phash=phash, status="completed"
-        )
+        return CalculateHashResponse(photo_id=photo_id, phash=phash, status="completed")
 
     except Exception as e:
         raise HTTPException(

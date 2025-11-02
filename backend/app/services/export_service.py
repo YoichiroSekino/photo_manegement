@@ -308,9 +308,7 @@ class ExportService:
             self.save_photo_xml(folders["root"], xml_content)
 
             # ZIPアーカイブ作成
-            archive_name = (
-                f"{project_name}_export.zip" if project_name else None
-            )
+            archive_name = f"{project_name}_export.zip" if project_name else None
             zip_path = self.create_zip_archive(
                 folders["root"], export_dir, archive_name
             )

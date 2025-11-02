@@ -9,13 +9,15 @@ from enum import Enum
 
 class LayoutType(str, Enum):
     """レイアウトタイプ"""
+
     STANDARD = "standard"  # 1ページ2枚
-    COMPACT = "compact"    # 1ページ4枚
+    COMPACT = "compact"  # 1ページ4枚
     DETAILED = "detailed"  # 1ページ1枚
 
 
 class CoverData(BaseModel):
     """表紙データ"""
+
     project_name: Optional[str] = Field(None, description="工事名")
     contractor: Optional[str] = Field(None, description="施工業者名")
     period_from: Optional[str] = Field(None, description="工期開始日")
@@ -25,6 +27,7 @@ class CoverData(BaseModel):
 
 class PhotoAlbumGenerationRequest(BaseModel):
     """写真帳生成リクエスト"""
+
     photo_ids: List[int] = Field(..., description="写真IDリスト")
     layout_type: LayoutType = Field(LayoutType.STANDARD, description="レイアウトタイプ")
     cover_data: Optional[CoverData] = Field(None, description="表紙データ")
@@ -35,6 +38,7 @@ class PhotoAlbumGenerationRequest(BaseModel):
 
 class PhotoAlbumGenerationResponse(BaseModel):
     """写真帳生成レスポンス"""
+
     success: bool = Field(..., description="成功フラグ")
     pdf_path: Optional[str] = Field(None, description="PDFファイルパス")
     download_url: Optional[str] = Field(None, description="ダウンロードURL")

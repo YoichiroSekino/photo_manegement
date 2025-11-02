@@ -221,6 +221,21 @@ class TestDuplicateDetectionService:
         )
 
         assert image_data == b"fake_image_data"
-        mock_s3.get_object.assert_called_once_with(
-            Bucket="test-bucket", Key="test.jpg"
-        )
+        mock_s3.get_object.assert_called_once_with(Bucket="test-bucket", Key="test.jpg")
+
+    def test_find_duplicates_single_photo(self, duplicate_service):
+        """写真が1枚のみの場合"""
+        photos = [{"id": 1, "phash": "abc"}]
+
+        duplicates = duplicate_service.find_duplicates_in_photos(photos)
+
+        assert duplicates == []
+
+    def test_create_duplicate_summary_empty_groups(self, duplicate_service):
+        """重複グループが空の場合"""
+        summary = duplicate_service.create_duplicate_summary([])
+
+        assert summary["total_groups"] == 0
+        assert summary["total_duplicate_photos"] == 0
+        assert summary["avg_similarity"] == 0.0
+        assert summary["largest_group_size"] == 0

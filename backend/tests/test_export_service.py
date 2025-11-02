@@ -165,7 +165,9 @@ class TestExportService:
         export_dir = tmp_path / "export_test"
         folders = export_service.create_folder_structure(str(export_dir))
 
-        xml_content = '<?xml version="1.0" encoding="Shift_JIS"?><photodata></photodata>'
+        xml_content = (
+            '<?xml version="1.0" encoding="Shift_JIS"?><photodata></photodata>'
+        )
         xml_path = export_service.save_photo_xml(folders["root"], xml_content)
 
         assert os.path.exists(xml_path)

@@ -27,7 +27,9 @@ class BlackboardData(BaseModel):
 class OCRService:
     """OCRサービス"""
 
-    def __init__(self, confidence_threshold: float = 70.0, region: str = "ap-northeast-1"):
+    def __init__(
+        self, confidence_threshold: float = 70.0, region: str = "ap-northeast-1"
+    ):
         """
         Args:
             confidence_threshold: テキスト認識の信頼度閾値（0-100）

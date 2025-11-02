@@ -9,7 +9,20 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from app import __version__
-from app.routers import photos, ocr, search, rekognition, duplicate, quality, title, photo_xml, export, photo_album, auth
+from app.routers import (
+    photos,
+    ocr,
+    search,
+    rekognition,
+    duplicate,
+    quality,
+    title,
+    photo_xml,
+    export,
+    photo_album,
+    auth,
+)
+from app.middleware import TenantIdentificationMiddleware
 
 # Rate limiter初期化
 limiter = Limiter(key_func=get_remote_address)
@@ -24,6 +37,9 @@ app = FastAPI(
 # Rate limiterをアプリケーションに追加
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# テナント識別ミドルウェア（CORSより先に実行）
+app.add_middleware(TenantIdentificationMiddleware)
 
 # CORS設定
 app.add_middleware(

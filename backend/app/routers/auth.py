@@ -21,6 +21,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 class UserRegister(BaseModel):
     """ユーザー登録リクエスト"""
+
     email: EmailStr
     password: str
     full_name: str | None = None
@@ -28,12 +29,14 @@ class UserRegister(BaseModel):
 
 class UserLogin(BaseModel):
     """ログインリクエスト"""
+
     email: EmailStr
     password: str
 
 
 class TokenResponse(BaseModel):
     """トークンレスポンス"""
+
     access_token: str
     refresh_token: str
     token_type: str
@@ -41,6 +44,7 @@ class TokenResponse(BaseModel):
 
 class UserResponse(BaseModel):
     """ユーザーレスポンス"""
+
     id: int
     email: str
     full_name: str | None
@@ -50,7 +54,9 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     """
     新規ユーザー登録
@@ -94,7 +100,9 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit("5/minute")
-async def login(request: Request, credentials: UserLogin, db: Session = Depends(get_db)):
+async def login(
+    request: Request, credentials: UserLogin, db: Session = Depends(get_db)
+):
     """
     ユーザーログイン
 

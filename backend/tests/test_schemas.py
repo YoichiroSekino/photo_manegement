@@ -45,6 +45,7 @@ def test_photo_response_schema():
     """PhotoResponseスキーマのテスト"""
     data = {
         "id": 1,
+        "organization_id": 1,  # マルチテナント対応：organization_id必須
         "file_name": "test.jpg",
         "file_size": 1024000,
         "mime_type": "image/jpeg",
@@ -56,6 +57,7 @@ def test_photo_response_schema():
     photo = PhotoResponse(**data)
 
     assert photo.id == 1
+    assert photo.organization_id == 1
     assert photo.file_name == "test.jpg"
     assert photo.s3_url == "https://example.com/test.jpg"
 

@@ -79,9 +79,7 @@ async def assess_quality(photo_id: int, db: Session = Depends(get_db)):
         )
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"品質評価に失敗しました: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"品質評価に失敗しました: {str(e)}")
 
 
 @router.get("/{photo_id}/quality", response_model=QualityCheckResponse)
@@ -109,7 +107,8 @@ async def get_quality(photo_id: int, db: Session = Depends(get_db)):
     # 品質情報取得
     if photo.photo_metadata is None or "quality" not in photo.photo_metadata:
         raise HTTPException(
-            status_code=404, detail="品質評価が実行されていません。先に評価してください。"
+            status_code=404,
+            detail="品質評価が実行されていません。先に評価してください。",
         )
 
     quality_data = photo.photo_metadata["quality"]

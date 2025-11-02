@@ -61,7 +61,20 @@
       "Bash(./venv/Scripts/alembic:*)",
       "Bash(npm run build:*)",
       "Bash(gh issue comment:*)",
-      "Bash(gh issue close:*)"
+      "Bash(gh issue close:*)",
+      "Bash(./venv/Scripts/pytest --collect-only)",
+      "Bash(./venv/Scripts/pytest --co -q)",
+      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing --no-cov-on-fail -v)",
+      "Bash(timeout 5 bash:*)",
+      "Bash(./venv/Scripts/pytest tests/test_main.py -v)",
+      "Bash(./venv/Scripts/pytest --tb=short -v)",
+      "Bash(./venv/Scripts/pytest --tb=line -q)",
+      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term --no-cov-on-fail)",
+      "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing --no-cov-on-fail)",
+      "Bash(./venv/Scripts/pytest --cov=app/routers/search --cov-report=term-missing tests/test_api_search.py)",
+      "Bash(./venv/Scripts/pytest:*)",
+      "Bash(./venv/Scripts/black --check app/ tests/)",
+      "Bash(./venv/Scripts/black app/ tests/)"
     ],
     "deny": [],
     "ask": []

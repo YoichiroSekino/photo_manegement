@@ -81,9 +81,7 @@ class TestTitleGenerationService:
         assert "土工" in title
         assert "20240320" in title
 
-    def test_generate_title_with_no_ocr_data(
-        self, title_service, classification_data
-    ):
+    def test_generate_title_with_no_ocr_data(self, title_service, classification_data):
         """OCRデータなしでタイトル生成テスト"""
         title = title_service.generate_title(
             ocr_data={}, classification_data=classification_data

@@ -22,8 +22,9 @@ from PIL import Image
 
 class LayoutType(Enum):
     """レイアウトタイプ"""
+
     STANDARD = "standard"  # 1ページ2枚
-    COMPACT = "compact"    # 1ページ4枚
+    COMPACT = "compact"  # 1ページ4枚
     DETAILED = "detailed"  # 1ページ1枚
 
 
@@ -39,11 +40,11 @@ class PhotoAlbumGenerator:
 
         # 日本語フォント登録
         try:
-            pdfmetrics.registerFont(UnicodeCIDFont('HeiseiMin-W3'))
-            self.font_name = 'HeiseiMin-W3'
+            pdfmetrics.registerFont(UnicodeCIDFont("HeiseiMin-W3"))
+            self.font_name = "HeiseiMin-W3"
         except:
             # フォント登録失敗時はHelveticaを使用
-            self.font_name = 'Helvetica'
+            self.font_name = "Helvetica"
 
     def generate_pdf(
         self,
@@ -96,7 +97,9 @@ class PhotoAlbumGenerator:
             photo_pages = self._generate_photo_pages(photos, layout_type)
             for page_photos in photo_pages:
                 self._draw_photo_page(
-                    c, page_photos, layout_type,
+                    c,
+                    page_photos,
+                    layout_type,
                     header_text=header_text,
                     footer_text=footer_text,
                 )
@@ -115,7 +118,9 @@ class PhotoAlbumGenerator:
             file_size = os.path.getsize(output_path)
 
             # ページ数計算
-            total_pages = page_count + len(photo_pages) if not add_page_numbers else page_count
+            total_pages = (
+                page_count + len(photo_pages) if not add_page_numbers else page_count
+            )
 
             return {
                 "success": True,
@@ -169,7 +174,9 @@ class PhotoAlbumGenerator:
 
         # タイトル
         c.setFont(self.font_name, 24)
-        c.drawCentredString(self.page_width / 2, self.page_height - 100 * mm, "工事写真帳")
+        c.drawCentredString(
+            self.page_width / 2, self.page_height - 100 * mm, "工事写真帳"
+        )
 
         # 工事名
         c.setFont(self.font_name, 16)
@@ -179,19 +186,27 @@ class PhotoAlbumGenerator:
         # 施工業者
         y_position -= 30 * mm
         c.setFont(self.font_name, 12)
-        c.drawCentredString(self.page_width / 2, y_position, f"施工: {cover_info['contractor']}")
+        c.drawCentredString(
+            self.page_width / 2, y_position, f"施工: {cover_info['contractor']}"
+        )
 
         # 工期
         if cover_info["period"]:
             y_position -= 20 * mm
-            c.drawCentredString(self.page_width / 2, y_position, f"工期: {cover_info['period']}")
+            c.drawCentredString(
+                self.page_width / 2, y_position, f"工期: {cover_info['period']}"
+            )
 
         # 場所
         if cover_info["location"]:
             y_position -= 20 * mm
-            c.drawCentredString(self.page_width / 2, y_position, f"場所: {cover_info['location']}")
+            c.drawCentredString(
+                self.page_width / 2, y_position, f"場所: {cover_info['location']}"
+            )
 
-    def _generate_photo_pages(self, photos: List[Dict], layout_type: LayoutType) -> List[List[Dict]]:
+    def _generate_photo_pages(
+        self, photos: List[Dict], layout_type: LayoutType
+    ) -> List[List[Dict]]:
         """
         写真をページごとに分割
 
@@ -212,7 +227,7 @@ class PhotoAlbumGenerator:
         pages = []
 
         for i in range(0, len(photos), per_page):
-            pages.append(photos[i:i + per_page])
+            pages.append(photos[i : i + per_page])
 
         return pages
 
@@ -258,8 +273,15 @@ class PhotoAlbumGenerator:
         photo_width = self.page_width - 2 * self.margin
 
         for idx, photo in enumerate(photos):
-            y_position = self.page_height - self.margin - (idx + 1) * photo_height - idx * self.margin / 2
-            self._draw_single_photo(c, photo, self.margin, y_position, photo_width, photo_height)
+            y_position = (
+                self.page_height
+                - self.margin
+                - (idx + 1) * photo_height
+                - idx * self.margin / 2
+            )
+            self._draw_single_photo(
+                c, photo, self.margin, y_position, photo_width, photo_height
+            )
 
     def _draw_compact_layout(self, c: canvas.Canvas, photos: List[Dict]):
         """コンパクトレイアウト（1ページ4枚）を描画"""
@@ -268,9 +290,18 @@ class PhotoAlbumGenerator:
 
         positions = [
             (self.margin, self.page_height - self.margin - photo_height),  # 左上
-            (self.page_width / 2 + self.margin / 2, self.page_height - self.margin - photo_height),  # 右上
-            (self.margin, self.page_height - 2 * self.margin - 2 * photo_height),  # 左下
-            (self.page_width / 2 + self.margin / 2, self.page_height - 2 * self.margin - 2 * photo_height),  # 右下
+            (
+                self.page_width / 2 + self.margin / 2,
+                self.page_height - self.margin - photo_height,
+            ),  # 右上
+            (
+                self.margin,
+                self.page_height - 2 * self.margin - 2 * photo_height,
+            ),  # 左下
+            (
+                self.page_width / 2 + self.margin / 2,
+                self.page_height - 2 * self.margin - 2 * photo_height,
+            ),  # 右下
         ]
 
         for idx, photo in enumerate(photos):
@@ -280,15 +311,23 @@ class PhotoAlbumGenerator:
 
     def _draw_detailed_layout(self, c: canvas.Canvas, photos: List[Dict]):
         """詳細レイアウト（1ページ1枚）を描画"""
-        photo_height = (self.page_height - 4 * self.margin)
+        photo_height = self.page_height - 4 * self.margin
         photo_width = self.page_width - 2 * self.margin
 
         if len(photos) > 0:
             photo = photos[0]
-            self._draw_single_photo(c, photo, self.margin, self.margin * 2, photo_width, photo_height)
+            self._draw_single_photo(
+                c, photo, self.margin, self.margin * 2, photo_width, photo_height
+            )
 
     def _draw_single_photo(
-        self, c: canvas.Canvas, photo: Dict, x: float, y: float, width: float, height: float
+        self,
+        c: canvas.Canvas,
+        photo: Dict,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
     ):
         """
         単一写真を描画
@@ -326,7 +365,7 @@ class PhotoAlbumGenerator:
 
                 # 画像を一時ファイルに保存して描画（ReportLabの制約）
                 temp_img = BytesIO()
-                img.save(temp_img, format='JPEG')
+                img.save(temp_img, format="JPEG")
                 temp_img.seek(0)
 
                 c.drawImage(temp_img, img_x, img_y, new_width, new_height)
@@ -371,7 +410,7 @@ class PhotoAlbumGenerator:
         img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
 
         output = BytesIO()
-        img.save(output, format='JPEG', quality=85)
+        img.save(output, format="JPEG", quality=85)
         return output.getvalue()
 
     def generate_thumbnail(self, image_data: bytes, size: tuple) -> bytes:
@@ -389,7 +428,7 @@ class PhotoAlbumGenerator:
         img.thumbnail(size, Image.Resampling.LANCZOS)
 
         output = BytesIO()
-        img.save(output, format='JPEG', quality=75)
+        img.save(output, format="JPEG", quality=75)
         return output.getvalue()
 
     def get_page_count(self, photo_count: int, layout_type: LayoutType) -> int:

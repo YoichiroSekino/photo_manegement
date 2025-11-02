@@ -108,22 +108,27 @@ class JWTHandler:
         return pwd_context.hash(password)
 
 
-def create_tokens(user_id: int, email: str) -> Dict[str, str]:
+def create_tokens(user_id: int, email: str, organization_id: int) -> Dict[str, str]:
     """
-    アクセストークンとリフレッシュトークンを作成
+    アクセストークンとリフレッシュトークンを作成（マルチテナント対応）
 
     Args:
         user_id: ユーザーID
         email: メールアドレス
+        organization_id: 組織ID
 
     Returns:
         アクセストークンとリフレッシュトークンの辞書
     """
     access_token = JWTHandler.create_access_token(
-        data={"sub": str(user_id), "email": email}
+        data={"sub": str(user_id), "email": email, "org_id": organization_id}
     )
     refresh_token = JWTHandler.create_refresh_token(
-        data={"sub": str(user_id), "email": email}
+        data={"sub": str(user_id), "email": email, "org_id": organization_id}
     )
 
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+    }

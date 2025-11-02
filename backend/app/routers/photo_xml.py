@@ -56,7 +56,9 @@ async def generate_photo_xml(
             "id": photo.id,
             "file_name": photo.file_name,
             "title": photo.title or "",
-            "shooting_date": photo.shooting_date.isoformat() if photo.shooting_date else "",
+            "shooting_date": (
+                photo.shooting_date.isoformat() if photo.shooting_date else ""
+            ),
             "major_category": photo.major_category or "",
             "photo_type": photo.photo_type or "",
             "work_type": photo.work_type or "",
@@ -141,7 +143,9 @@ async def validate_photo_xml(
             "id": photo.id,
             "file_name": photo.file_name,
             "title": photo.title or "",
-            "shooting_date": photo.shooting_date.isoformat() if photo.shooting_date else "",
+            "shooting_date": (
+                photo.shooting_date.isoformat() if photo.shooting_date else ""
+            ),
             "major_category": photo.major_category or "",
             "photo_type": photo.photo_type or "",
             "work_type": photo.work_type or "",

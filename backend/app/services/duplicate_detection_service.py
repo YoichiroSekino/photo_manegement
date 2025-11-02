@@ -138,9 +138,7 @@ class DuplicateDetectionService:
                 if i == j or photo2["id"] in processed:
                     continue
 
-                similarity = self.calculate_similarity(
-                    photo1["phash"], photo2["phash"]
-                )
+                similarity = self.calculate_similarity(photo1["phash"], photo2["phash"])
 
                 if similarity >= self.similarity_threshold:
                     similar_photos.append(photo2)
@@ -150,7 +148,9 @@ class DuplicateDetectionService:
             # グループが2枚以上の場合のみ追加
             if len(similar_photos) >= 2:
                 processed.add(photo1["id"])
-                avg_similarity = sum(similarities) / len(similarities) if similarities else 100.0
+                avg_similarity = (
+                    sum(similarities) / len(similarities) if similarities else 100.0
+                )
 
                 groups.append(
                     DuplicateGroup(photos=similar_photos, avg_similarity=avg_similarity)
@@ -177,9 +177,8 @@ class DuplicateDetectionService:
             }
 
         total_photos = sum(len(group.photos) for group in duplicate_groups)
-        avg_similarity = (
-            sum(group.avg_similarity for group in duplicate_groups)
-            / len(duplicate_groups)
+        avg_similarity = sum(group.avg_similarity for group in duplicate_groups) / len(
+            duplicate_groups
         )
         largest_group_size = max(len(group.photos) for group in duplicate_groups)
 

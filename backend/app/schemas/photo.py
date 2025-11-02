@@ -74,6 +74,7 @@ class PhotoResponse(PhotoBase):
     """写真レスポンススキーマ"""
 
     id: int
+    organization_id: int
     s3_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
 

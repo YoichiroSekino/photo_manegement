@@ -1,12 +1,510 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1762034060370" clover="3.2.0">
-  <project timestamp="1762034060370" name="All files">
-    <metrics statements="50" coveredstatements="36" conditionals="19" coveredconditionals="15" methods="18" coveredmethods="9" elements="87" coveredelements="60" complexity="0" loc="50" ncloc="50" packages="3" files="3" classes="3"/>
+<coverage generated="1762053624700" clover="3.2.0">
+  <project timestamp="1762053624700" name="All files">
+    <metrics statements="787" coveredstatements="99" conditionals="335" coveredconditionals="39" methods="282" coveredmethods="24" elements="1404" coveredelements="162" complexity="0" loc="787" ncloc="787" packages="20" files="31" classes="31"/>
     <package name="app">
-      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <metrics statements="10" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+      <file name="layout.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\layout.tsx">
+        <metrics statements="9" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
       <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\page.tsx">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="3" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.duplicates">
+      <metrics statements="32" coveredstatements="0" conditionals="11" coveredconditionals="0" methods="11" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\duplicates\page.tsx">
+        <metrics statements="32" coveredstatements="0" conditionals="11" coveredconditionals="0" methods="11" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="45" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="50" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.export">
+      <metrics statements="45" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\export\page.tsx">
+        <metrics statements="45" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="8" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="28" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="66" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="138" count="0" type="stmt"/>
+        <line num="191" count="0" type="stmt"/>
+        <line num="230" count="0" type="stmt"/>
+        <line num="237" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.login">
+      <metrics statements="28" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="6" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\login\page.tsx">
+        <metrics statements="28" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="6" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="23" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="30" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.photos">
+      <metrics statements="14" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="6" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\photos\page.tsx">
+        <metrics statements="14" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="6" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.quality">
+      <metrics statements="38" coveredstatements="0" conditionals="20" coveredconditionals="0" methods="17" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\quality\page.tsx">
+        <metrics statements="38" coveredstatements="0" conditionals="20" coveredconditionals="0" methods="17" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="33" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="38" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="55" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="56" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="57" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="58" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="68" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="161" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="233" count="0" type="stmt"/>
+        <line num="239" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.search">
+      <metrics statements="19" coveredstatements="0" conditionals="7" coveredconditionals="0" methods="8" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\search\page.tsx">
+        <metrics statements="19" coveredstatements="0" conditionals="7" coveredconditionals="0" methods="8" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.upload">
+      <metrics statements="45" coveredstatements="0" conditionals="17" coveredconditionals="0" methods="9" coveredmethods="0"/>
+      <file name="page.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\app\upload\page.tsx">
+        <metrics statements="45" coveredstatements="0" conditionals="17" coveredconditionals="0" methods="9" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="119" count="0" type="stmt"/>
+        <line num="120" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.common">
+      <metrics statements="26" coveredstatements="0" conditionals="7" coveredconditionals="0" methods="14" coveredmethods="0"/>
+      <file name="ErrorBoundary.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\common\ErrorBoundary.tsx">
+        <metrics statements="12" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="6" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="41" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+      </file>
+      <file name="NotificationToast.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\common\NotificationToast.tsx">
+        <metrics statements="14" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="8" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.duplicate">
+      <metrics statements="15" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="7" coveredmethods="0"/>
+      <file name="DuplicateComparison.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\duplicate\DuplicateComparison.tsx">
+        <metrics statements="15" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="33" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="40" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="41" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.export">
+      <metrics statements="76" coveredstatements="0" conditionals="43" coveredconditionals="0" methods="39" coveredmethods="0"/>
+      <file name="ExportWizard.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\export\ExportWizard.tsx">
+        <metrics statements="42" coveredstatements="0" conditionals="34" coveredconditionals="0" methods="22" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="165" count="0" type="stmt"/>
+        <line num="167" count="0" type="stmt"/>
+        <line num="206" count="0" type="stmt"/>
+        <line num="220" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="238" count="0" type="stmt"/>
+      </file>
+      <file name="PhotoAlbumDialog.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\export\PhotoAlbumDialog.tsx">
+        <metrics statements="34" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="17" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="125" count="0" type="stmt"/>
+        <line num="146" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="175" count="0" type="stmt"/>
+        <line num="190" count="0" type="stmt"/>
+        <line num="205" count="0" type="stmt"/>
+        <line num="220" count="0" type="stmt"/>
+        <line num="243" count="0" type="stmt"/>
+        <line num="254" count="0" type="stmt"/>
+        <line num="264" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.photos">
+      <metrics statements="9" coveredstatements="5" conditionals="9" coveredconditionals="8" methods="4" coveredmethods="2"/>
+      <file name="PhotoCard.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\photos\PhotoCard.tsx">
+        <metrics statements="5" coveredstatements="5" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="16" count="6" type="stmt"/>
+        <line num="17" count="6" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+      </file>
+      <file name="PhotoGrid.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\photos\PhotoGrid.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="45" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.quality">
+      <metrics statements="12" coveredstatements="0" conditionals="22" coveredconditionals="0" methods="5" coveredmethods="0"/>
+      <file name="QualityBadge.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\quality\QualityBadge.tsx">
+        <metrics statements="8" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="16" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="17" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+      </file>
+      <file name="QualityDetails.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\quality\QualityDetails.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="16" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="94" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="components.search">
+      <metrics statements="34" coveredstatements="0" conditionals="21" coveredconditionals="0" methods="17" coveredmethods="0"/>
+      <file name="FilterPanel.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\search\FilterPanel.tsx">
+        <metrics statements="24" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="13" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="59" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="73" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="139" count="0" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="174" count="0" type="stmt"/>
+        <line num="179" count="0" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
+        <line num="209" count="0" type="stmt"/>
+      </file>
+      <file name="SearchBar.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\components\search\SearchBar.tsx">
+        <metrics statements="10" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="15" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
       </file>
     </package>
     <package name="components.upload">
@@ -40,8 +538,209 @@
         <line num="54" count="2" type="stmt"/>
       </file>
     </package>
+    <package name="contexts">
+      <metrics statements="52" coveredstatements="0" conditionals="13" coveredconditionals="0" methods="7" coveredmethods="0"/>
+      <file name="AuthContext.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\contexts\AuthContext.tsx">
+        <metrics statements="52" coveredstatements="0" conditionals="13" coveredconditionals="0" methods="7" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="31" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="49" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="78" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="80" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="88" count="0" type="stmt"/>
+        <line num="94" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="95" count="0" type="stmt"/>
+        <line num="96" count="0" type="stmt"/>
+        <line num="100" count="0" type="stmt"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="113" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="114" count="0" type="stmt"/>
+        <line num="115" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="119" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="124" count="0" type="stmt"/>
+        <line num="125" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="141" count="0" type="stmt"/>
+        <line num="142" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="143" count="0" type="stmt"/>
+        <line num="145" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="hooks">
+      <metrics statements="105" coveredstatements="0" conditionals="50" coveredconditionals="0" methods="36" coveredmethods="0"/>
+      <file name="usePhotos.ts" path="C:\ks\workspace\photo_manegement\frontend\src\hooks\usePhotos.ts">
+        <metrics statements="105" coveredstatements="0" conditionals="50" coveredconditionals="0" methods="36" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="136" count="0" type="stmt"/>
+        <line num="137" count="0" type="stmt"/>
+        <line num="138" count="0" type="stmt"/>
+        <line num="144" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="147" count="0" type="stmt"/>
+        <line num="150" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="153" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="158" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="162" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="163" count="0" type="stmt"/>
+        <line num="165" count="0" type="stmt"/>
+        <line num="174" count="0" type="stmt"/>
+        <line num="175" count="0" type="stmt"/>
+        <line num="177" count="0" type="stmt"/>
+        <line num="180" count="0" type="stmt"/>
+        <line num="181" count="0" type="stmt"/>
+        <line num="182" count="0" type="stmt"/>
+        <line num="184" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="185" count="0" type="stmt"/>
+        <line num="187" count="0" type="stmt"/>
+        <line num="197" count="0" type="stmt"/>
+        <line num="198" count="0" type="stmt"/>
+        <line num="200" count="0" type="stmt"/>
+        <line num="202" count="0" type="stmt"/>
+        <line num="203" count="0" type="stmt"/>
+        <line num="204" count="0" type="stmt"/>
+        <line num="205" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="206" count="0" type="stmt"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="213" count="0" type="stmt"/>
+        <line num="215" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="216" count="0" type="stmt"/>
+        <line num="218" count="0" type="stmt"/>
+        <line num="227" count="0" type="stmt"/>
+        <line num="228" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="231" count="0" type="stmt"/>
+        <line num="233" count="0" type="stmt"/>
+        <line num="234" count="0" type="stmt"/>
+        <line num="235" count="0" type="stmt"/>
+        <line num="237" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="238" count="0" type="stmt"/>
+        <line num="240" count="0" type="stmt"/>
+        <line num="244" count="0" type="stmt"/>
+        <line num="245" count="0" type="stmt"/>
+        <line num="253" count="0" type="stmt"/>
+        <line num="254" count="0" type="stmt"/>
+        <line num="255" count="0" type="stmt"/>
+        <line num="257" count="0" type="stmt"/>
+        <line num="265" count="0" type="stmt"/>
+        <line num="266" count="0" type="stmt"/>
+        <line num="267" count="0" type="stmt"/>
+        <line num="269" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="270" count="0" type="stmt"/>
+        <line num="272" count="0" type="stmt"/>
+        <line num="276" count="0" type="stmt"/>
+        <line num="277" count="0" type="stmt"/>
+        <line num="280" count="0" type="stmt"/>
+        <line num="288" count="0" type="stmt"/>
+        <line num="289" count="0" type="stmt"/>
+        <line num="290" count="0" type="stmt"/>
+        <line num="292" count="0" type="stmt"/>
+        <line num="294" count="0" type="stmt"/>
+        <line num="295" count="0" type="stmt"/>
+        <line num="297" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="298" count="0" type="stmt"/>
+        <line num="300" count="0" type="stmt"/>
+        <line num="304" count="0" type="stmt"/>
+        <line num="305" count="0" type="stmt"/>
+        <line num="313" count="0" type="stmt"/>
+        <line num="314" count="0" type="stmt"/>
+        <line num="315" count="0" type="stmt"/>
+        <line num="317" count="0" type="stmt"/>
+        <line num="319" count="0" type="stmt"/>
+        <line num="320" count="0" type="stmt"/>
+        <line num="321" count="0" type="stmt"/>
+        <line num="323" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="324" count="0" type="stmt"/>
+        <line num="326" count="0" type="stmt"/>
+        <line num="330" count="0" type="stmt"/>
+        <line num="331" count="0" type="stmt"/>
+        <line num="339" count="0" type="stmt"/>
+        <line num="340" count="0" type="stmt"/>
+        <line num="341" count="0" type="stmt"/>
+        <line num="343" count="0" type="stmt"/>
+        <line num="345" count="0" type="stmt"/>
+        <line num="346" count="0" type="stmt"/>
+        <line num="347" count="0" type="stmt"/>
+        <line num="349" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="350" count="0" type="stmt"/>
+        <line num="352" count="0" type="stmt"/>
+        <line num="356" count="0" type="stmt"/>
+        <line num="357" count="0" type="stmt"/>
+      </file>
+    </package>
     <package name="lib">
-      <metrics statements="24" coveredstatements="18" conditionals="10" coveredconditionals="10" methods="11" coveredmethods="4"/>
+      <metrics statements="145" coveredstatements="76" conditionals="42" coveredconditionals="26" methods="36" coveredmethods="17"/>
+      <file name="apiClient.ts" path="C:\ks\workspace\photo_manegement\frontend\src\lib\apiClient.ts">
+        <metrics statements="29" coveredstatements="29" conditionals="14" coveredconditionals="11" methods="8" coveredmethods="8"/>
+        <line num="5" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="7" count="3" type="stmt"/>
+        <line num="9" count="4" type="stmt"/>
+        <line num="10" count="4" type="stmt"/>
+        <line num="11" count="4" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="26" count="12" type="cond" truecount="1" falsecount="1"/>
+        <line num="30" count="12" type="stmt"/>
+        <line num="35" count="12" type="cond" truecount="1" falsecount="0"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="39" count="12" type="stmt"/>
+        <line num="44" count="12" type="cond" truecount="1" falsecount="0"/>
+        <line num="45" count="3" type="stmt"/>
+        <line num="46" count="3" type="stmt"/>
+        <line num="50" count="9" type="cond" truecount="1" falsecount="0"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="54" count="7" type="stmt"/>
+        <line num="60" count="1" type="stmt"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="67" count="2" type="stmt"/>
+        <line num="68" count="2" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="87" count="1" type="stmt"/>
+        <line num="88" count="1" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="98" count="1" type="stmt"/>
+      </file>
       <file name="fileValidator.ts" path="C:\ks\workspace\photo_manegement\frontend\src\lib\fileValidator.ts">
         <metrics statements="24" coveredstatements="18" conditionals="10" coveredconditionals="10" methods="11" coveredmethods="4"/>
         <line num="6" count="1" type="cond" truecount="2" falsecount="0"/>
@@ -68,6 +767,179 @@
         <line num="108" count="0" type="stmt"/>
         <line num="109" count="0" type="stmt"/>
         <line num="111" count="0" type="stmt"/>
+      </file>
+      <file name="queryClient.ts" path="C:\ks\workspace\photo_manegement\frontend\src\lib\queryClient.ts">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+      </file>
+      <file name="s3Upload.ts" path="C:\ks\workspace\photo_manegement\frontend\src\lib\s3Upload.ts">
+        <metrics statements="89" coveredstatements="29" conditionals="18" coveredconditionals="5" methods="16" coveredmethods="5"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="84" count="0" type="stmt"/>
+        <line num="87" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="88" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="105" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="109" count="0" type="stmt"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="113" count="0" type="stmt"/>
+        <line num="114" count="0" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="118" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="138" count="0" type="stmt"/>
+        <line num="142" count="0" type="stmt"/>
+        <line num="148" count="0" type="stmt"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="155" count="0" type="stmt"/>
+        <line num="162" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="172" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="173" count="0" type="stmt"/>
+        <line num="174" count="0" type="stmt"/>
+        <line num="186" count="0" type="stmt"/>
+        <line num="188" count="0" type="stmt"/>
+        <line num="189" count="0" type="stmt"/>
+        <line num="190" count="0" type="stmt"/>
+        <line num="194" count="0" type="stmt"/>
+        <line num="205" count="0" type="stmt"/>
+        <line num="209" count="0" type="stmt"/>
+        <line num="211" count="0" type="stmt"/>
+        <line num="222" count="0" type="stmt"/>
+        <line num="223" count="0" type="stmt"/>
+        <line num="224" count="0" type="stmt"/>
+        <line num="226" count="0" type="stmt"/>
+        <line num="227" count="0" type="stmt"/>
+        <line num="228" count="0" type="stmt"/>
+        <line num="229" count="0" type="stmt"/>
+        <line num="234" count="0" type="stmt"/>
+        <line num="235" count="0" type="stmt"/>
+        <line num="238" count="0" type="stmt"/>
+        <line num="245" count="8" type="stmt"/>
+        <line num="254" count="15" type="stmt"/>
+        <line num="256" count="15" type="stmt"/>
+        <line num="257" count="30" type="stmt"/>
+        <line num="265" count="30" type="stmt"/>
+        <line num="268" count="15" type="stmt"/>
+        <line num="269" count="15" type="stmt"/>
+        <line num="272" count="15" type="stmt"/>
+        <line num="284" count="15" type="cond" truecount="1" falsecount="0"/>
+        <line num="285" count="2" type="stmt"/>
+        <line num="288" count="13" type="stmt"/>
+        <line num="291" count="13" type="stmt"/>
+        <line num="299" count="13" type="cond" truecount="1" falsecount="0"/>
+        <line num="300" count="1" type="stmt"/>
+        <line num="303" count="12" type="stmt"/>
+        <line num="304" count="12" type="stmt"/>
+        <line num="306" count="12" type="stmt"/>
+        <line num="312" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="313" count="3" type="stmt"/>
+        <line num="314" count="3" type="stmt"/>
+        <line num="327" count="3" type="stmt"/>
+        <line num="329" count="3" type="stmt"/>
+        <line num="330" count="5" type="stmt"/>
+        <line num="331" count="5" type="stmt"/>
+        <line num="333" count="10" type="stmt"/>
+        <line num="334" count="20" type="stmt"/>
+        <line num="338" count="5" type="stmt"/>
+        <line num="341" count="3" type="stmt"/>
+      </file>
+    </package>
+    <package name="providers">
+      <metrics statements="4" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <file name="QueryProvider.tsx" path="C:\ks\workspace\photo_manegement\frontend\src\providers\QueryProvider.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="store">
+      <metrics statements="53" coveredstatements="0" conditionals="14" coveredconditionals="0" methods="43" coveredmethods="0"/>
+      <file name="filterStore.ts" path="C:\ks\workspace\photo_manegement\frontend\src\store\filterStore.ts">
+        <metrics statements="12" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="11" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="67" count="0" type="cond" truecount="0" falsecount="2"/>
+      </file>
+      <file name="uiStore.ts" path="C:\ks\workspace\photo_manegement\frontend\src\store\uiStore.ts">
+        <metrics statements="23" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="16" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="62" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="79" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="84" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="92" count="0" type="stmt"/>
+        <line num="99" count="0" type="stmt"/>
+        <line num="100" count="0" type="stmt"/>
+        <line num="104" count="0" type="stmt"/>
+      </file>
+      <file name="uploadStore.ts" path="C:\ks\workspace\photo_manegement\frontend\src\store\uploadStore.ts">
+        <metrics statements="18" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="16" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="62" count="0" type="stmt"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="64" count="0" type="stmt"/>
+        <line num="66" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="82" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="94" count="0" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="104" count="0" type="stmt"/>
+        <line num="108" count="0" type="stmt"/>
       </file>
     </package>
   </project>

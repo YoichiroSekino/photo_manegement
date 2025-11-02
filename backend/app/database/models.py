@@ -19,8 +19,43 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.types import TypeDecorator
 
 Base = declarative_base()
+
+
+class Organization(Base):
+    """組織テーブル（マルチテナント対応）"""
+
+    __tablename__ = "organizations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    subdomain = Column(String(100), unique=True, nullable=False, index=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<Organization(id={self.id}, subdomain='{self.subdomain}')>"
+
+
+# テスト環境でTSVECTORをTextにフォールバックする型
+class TSVECTORType(TypeDecorator):
+    """PostgreSQL TSVECTORとSQLite Textの互換型"""
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(TSVECTOR())
+        else:
+            # SQLiteやその他のDBではText型にフォールバック
+            return dialect.type_descriptor(Text())
 
 
 class Photo(Base):
@@ -29,6 +64,16 @@ class Photo(Base):
     __tablename__ = "photos"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # マルチテナント対応
+    organization_id = Column(
+        Integer,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    organization = relationship("Organization")
+
     file_name = Column(String(255), nullable=False)
     file_size = Column(BigInteger, nullable=False)
     mime_type = Column(String(100), nullable=False)
@@ -64,8 +109,8 @@ class Photo(Base):
     ocr_confidence = Column(Float, nullable=True)  # OCR信頼度（0.0-1.0）
     ocr_metadata = Column(JSON, nullable=True)  # OCR詳細メタデータ
 
-    # 全文検索用（PostgreSQL TSVector）
-    search_vector = Column(TSVECTOR, nullable=True)
+    # 全文検索用（PostgreSQL TSVector / SQLite Text）
+    search_vector = Column(TSVECTORType, nullable=True)
 
     # 重複検出用
     perceptual_hash = Column(String(64), nullable=True, index=True)  # 画像ハッシュ
@@ -94,6 +139,10 @@ class Photo(Base):
 # GINインデックス（全文検索用）
 Index("ix_photos_search_vector", Photo.search_vector, postgresql_using="gin")
 
+# マルチテナント対応の複合インデックス
+Index("ix_photos_org_created", Photo.organization_id, Photo.created_at)
+Index("ix_photos_org_shooting_date", Photo.organization_id, Photo.shooting_date)
+
 
 class User(Base):
     """ユーザーテーブル"""
@@ -101,6 +150,16 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # マルチテナント対応
+    organization_id = Column(
+        Integer,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    organization = relationship("Organization")
+
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=True)
@@ -122,11 +181,25 @@ class PhotoDuplicate(Base):
     __tablename__ = "photo_duplicates"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # マルチテナント対応
+    organization_id = Column(
+        Integer,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    organization = relationship("Organization")
+
     photo1_id = Column(Integer, ForeignKey("photos.id"), nullable=False, index=True)
     photo2_id = Column(Integer, ForeignKey("photos.id"), nullable=False, index=True)
     similarity_score = Column(Float, nullable=False)  # 類似度スコア（0.0-1.0）
-    duplicate_type = Column(String(50), nullable=True)  # 重複タイプ（exact, similar, etc.）
-    status = Column(String(20), default="pending", nullable=False)  # pending, confirmed, rejected
+    duplicate_type = Column(
+        String(50), nullable=True
+    )  # 重複タイプ（exact, similar, etc.）
+    status = Column(
+        String(20), default="pending", nullable=False
+    )  # pending, confirmed, rejected
     confirmed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     confirmed_at = Column(DateTime, nullable=True)
 
@@ -145,6 +218,16 @@ class Project(Base):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # マルチテナント対応
+    organization_id = Column(
+        Integer,
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    organization = relationship("Organization")
+
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     client_name = Column(String(255), nullable=True)

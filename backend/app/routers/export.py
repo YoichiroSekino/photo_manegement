@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.database.models import Photo
+from app.database.models import Photo, User
 from app.schemas.export import (
     ExportRequest,
     ExportResponse,
@@ -19,6 +19,7 @@ from app.schemas.export import (
 )
 from app.services.export_service import ExportService
 from app.services.photo_xml_generator import PhotoXMLGenerator
+from app.auth.dependencies import get_current_active_user
 
 router = APIRouter(prefix="/api/v1/export", tags=["export"])
 
@@ -27,19 +28,28 @@ router = APIRouter(prefix="/api/v1/export", tags=["export"])
 async def export_package(
     request: ExportRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
-    電子納品パッケージをエクスポート
+    電子納品パッケージをエクスポート（マルチテナント対応）
 
     Args:
         request: エクスポートリクエスト
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        エクスポート結果
+        エクスポート結果（自組織のみ）
     """
-    # 写真データ取得
-    photos = db.query(Photo).filter(Photo.id.in_(request.photo_ids)).all()
+    # 写真データ取得（テナントフィルタ適用）
+    photos = (
+        db.query(Photo)
+        .filter(
+            Photo.id.in_(request.photo_ids),
+            Photo.organization_id == current_user.organization_id,
+        )
+        .all()
+    )
 
     if not photos:
         raise HTTPException(status_code=404, detail="指定された写真が見つかりません")
@@ -57,7 +67,9 @@ async def export_package(
             "id": photo.id,
             "file_name": photo.file_name,
             "title": photo.title or "",
-            "shooting_date": photo.shooting_date.isoformat() if photo.shooting_date else "",
+            "shooting_date": (
+                photo.shooting_date.isoformat() if photo.shooting_date else ""
+            ),
             "major_category": photo.major_category or "",
             "photo_type": photo.photo_type or "",
             "work_type": photo.work_type or "",
@@ -100,9 +112,7 @@ async def export_package(
 
         # ファイルリネーム情報生成
         file_renames = export_service.rename_multiple_photos(photo_dicts)
-        file_rename_infos = [
-            FileRenameInfo(**rename) for rename in file_renames
-        ]
+        file_rename_infos = [FileRenameInfo(**rename) for rename in file_renames]
 
         return ExportResponse(
             success=True,
@@ -132,19 +142,28 @@ async def export_package(
 async def validate_export(
     request: ExportRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
-    エクスポート前にデータをバリデーション
+    エクスポート前にデータをバリデーション（マルチテナント対応）
 
     Args:
         request: エクスポートリクエスト
         db: データベースセッション
+        current_user: 現在の認証済みユーザー
 
     Returns:
-        バリデーション結果
+        バリデーション結果（自組織のみ）
     """
-    # 写真データ取得
-    photos = db.query(Photo).filter(Photo.id.in_(request.photo_ids)).all()
+    # 写真データ取得（テナントフィルタ適用）
+    photos = (
+        db.query(Photo)
+        .filter(
+            Photo.id.in_(request.photo_ids),
+            Photo.organization_id == current_user.organization_id,
+        )
+        .all()
+    )
 
     if not photos:
         return ExportValidationResponse(
@@ -176,7 +195,9 @@ async def validate_export(
             "id": photo.id,
             "file_name": photo.file_name,
             "title": photo.title or "",
-            "shooting_date": photo.shooting_date.isoformat() if photo.shooting_date else "",
+            "shooting_date": (
+                photo.shooting_date.isoformat() if photo.shooting_date else ""
+            ),
             "major_category": photo.major_category or "",
             "photo_type": photo.photo_type or "",
             "work_type": photo.work_type or "",

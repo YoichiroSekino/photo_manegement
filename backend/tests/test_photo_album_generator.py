@@ -40,25 +40,27 @@ class TestPhotoAlbumGenerator:
         """複数写真データ"""
         photos = []
         for i in range(1, 5):
-            photos.append({
-                "id": i,
-                "file_name": f"P000000{i}.JPG",
-                "title": f"写真タイトル {i}",
-                "shooting_date": f"2024-03-1{i}",
-                "major_category": "工事",
-                "photo_type": "施工状況写真",
-                "work_type": "基礎工",
-                "image_data": None,
-            })
+            photos.append(
+                {
+                    "id": i,
+                    "file_name": f"P000000{i}.JPG",
+                    "title": f"写真タイトル {i}",
+                    "shooting_date": f"2024-03-1{i}",
+                    "major_category": "工事",
+                    "photo_type": "施工状況写真",
+                    "work_type": "基礎工",
+                    "image_data": None,
+                }
+            )
         return photos
 
     @pytest.fixture
     def dummy_image(self):
         """ダミー画像データ"""
         # 800x600のダミー画像作成
-        img = Image.new('RGB', (800, 600), color='blue')
+        img = Image.new("RGB", (800, 600), color="blue")
         img_bytes = BytesIO()
-        img.save(img_bytes, format='JPEG')
+        img.save(img_bytes, format="JPEG")
         return img_bytes.getvalue()
 
     def test_initialization(self, album_generator):
@@ -90,7 +92,9 @@ class TestPhotoAlbumGenerator:
         assert cover_info["contractor"] == "株式会社〇〇建設"
         assert "period" in cover_info
 
-    def test_generate_pdf_minimal(self, album_generator, sample_photo_data, dummy_image, tmp_path):
+    def test_generate_pdf_minimal(
+        self, album_generator, sample_photo_data, dummy_image, tmp_path
+    ):
         """最小限のデータでPDF生成テスト"""
         # ダミー画像を設定
         sample_photo_data["image_data"] = dummy_image
@@ -108,7 +112,9 @@ class TestPhotoAlbumGenerator:
         assert result["total_pages"] > 0
         assert result["total_photos"] == 1
 
-    def test_generate_pdf_with_cover(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_generate_pdf_with_cover(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """表紙付きPDF生成テスト"""
         # 各写真にダミー画像を設定
         for photo in sample_photo_list:
@@ -132,7 +138,9 @@ class TestPhotoAlbumGenerator:
         assert os.path.exists(result["pdf_path"])
         assert result["total_pages"] >= 2  # 表紙 + 写真ページ
 
-    def test_layout_standard(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_layout_standard(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """標準レイアウト（1ページ2枚）テスト"""
         for photo in sample_photo_list:
             photo["image_data"] = dummy_image
@@ -149,7 +157,9 @@ class TestPhotoAlbumGenerator:
         # 4枚の写真 → 2ページ（1ページ2枚）
         assert result["total_pages"] == 2
 
-    def test_layout_compact(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_layout_compact(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """コンパクトレイアウト（1ページ4枚）テスト"""
         for photo in sample_photo_list:
             photo["image_data"] = dummy_image
@@ -166,7 +176,9 @@ class TestPhotoAlbumGenerator:
         # 4枚の写真 → 1ページ（1ページ4枚）
         assert result["total_pages"] == 1
 
-    def test_layout_detailed(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_layout_detailed(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """詳細レイアウト（1ページ1枚）テスト"""
         for photo in sample_photo_list:
             photo["image_data"] = dummy_image
@@ -183,7 +195,9 @@ class TestPhotoAlbumGenerator:
         # 4枚の写真 → 4ページ（1ページ1枚）
         assert result["total_pages"] == 4
 
-    def test_page_numbering(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_page_numbering(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """ページ番号付与テスト"""
         for photo in sample_photo_list:
             photo["image_data"] = dummy_image
@@ -200,7 +214,9 @@ class TestPhotoAlbumGenerator:
         assert result["success"] == True
         assert result["has_page_numbers"] == True
 
-    def test_header_footer(self, album_generator, sample_photo_data, dummy_image, tmp_path):
+    def test_header_footer(
+        self, album_generator, sample_photo_data, dummy_image, tmp_path
+    ):
         """ヘッダー/フッター追加テスト"""
         sample_photo_data["image_data"] = dummy_image
 
@@ -240,7 +256,9 @@ class TestPhotoAlbumGenerator:
         assert img.size[0] <= 150
         assert img.size[1] <= 150
 
-    def test_pdf_file_size(self, album_generator, sample_photo_list, dummy_image, tmp_path):
+    def test_pdf_file_size(
+        self, album_generator, sample_photo_list, dummy_image, tmp_path
+    ):
         """PDFファイルサイズ取得テスト"""
         for photo in sample_photo_list:
             photo["image_data"] = dummy_image
@@ -269,7 +287,9 @@ class TestPhotoAlbumGenerator:
         assert result["success"] == False
         assert len(result["errors"]) > 0
 
-    def test_invalid_image_data_error(self, album_generator, sample_photo_data, tmp_path):
+    def test_invalid_image_data_error(
+        self, album_generator, sample_photo_data, tmp_path
+    ):
         """不正な画像データのエラーハンドリングテスト"""
         sample_photo_data["image_data"] = b"invalid_image_data"
 

@@ -43,9 +43,7 @@ class TitleGenerationService:
             "舗装工": "舗装施工",
         }
 
-    def generate_title(
-        self, ocr_data: Dict, classification_data: Dict
-    ) -> str:
+    def generate_title(self, ocr_data: Dict, classification_data: Dict) -> str:
         """
         写真タイトルを自動生成
 
@@ -155,9 +153,7 @@ class TitleGenerationService:
         # パースできない場合は今日の日付
         return datetime.now().strftime("%Y%m%d")
 
-    def infer_subject_from_classification(
-        self, classification_data: Dict
-    ) -> str:
+    def infer_subject_from_classification(self, classification_data: Dict) -> str:
         """
         分類データから撮影対象を推定
 

@@ -157,22 +157,25 @@ describe('PresignedUploader', () => {
       const endpoint = '/api/v1/photos/upload';
 
       // モックレスポンス
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ presignedUrl: 'url1', key: 'key1', bucket: 'bucket' }),
-        })
-        .mockResolvedValueOnce({ ok: true })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ presignedUrl: 'url2', key: 'key2', bucket: 'bucket' }),
-        })
-        .mockResolvedValueOnce({ ok: true })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ presignedUrl: 'url3', key: 'key3', bucket: 'bucket' }),
-        })
-        .mockResolvedValueOnce({ ok: true });
+      // モックは並列実行に対応するため、URLに応じて適切なレスポンスを返す
+      (global.fetch as jest.Mock).mockClear();
+      let callCount = 0;
+      (global.fetch as jest.Mock).mockImplementation(async (url: string) => {
+        // Presigned URL取得リクエスト
+        if (url.includes(endpoint)) {
+          const currentCount = ++callCount;
+          return {
+            ok: true,
+            json: async () => ({
+              presignedUrl: `url${currentCount}`,
+              key: `key${currentCount}`,
+              bucket: 'bucket',
+            }),
+          };
+        }
+        // S3アップロードリクエスト
+        return { ok: true };
+      });
 
       const results = await PresignedUploader.uploadMultipleWithPresignedUrl(
         files,
@@ -180,9 +183,9 @@ describe('PresignedUploader', () => {
       );
 
       expect(results).toHaveLength(3);
-      expect(results[0].key).toBe('key1');
-      expect(results[1].key).toBe('key2');
-      expect(results[2].key).toBe('key3');
+      // 並列実行のため順序は保証されないが、すべてのファイルがアップロードされることを確認
+      const keys = results.map((r) => r.key).sort();
+      expect(keys).toEqual(['key1', 'key2', 'key3']);
     });
 
     it('should call progress callback for each file', async () => {
@@ -193,17 +196,22 @@ describe('PresignedUploader', () => {
       const endpoint = '/api/v1/photos/upload';
       const progressCallback = jest.fn();
 
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ presignedUrl: 'url1', key: 'key1', bucket: 'bucket' }),
-        })
-        .mockResolvedValueOnce({ ok: true })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ presignedUrl: 'url2', key: 'key2', bucket: 'bucket' }),
-        })
-        .mockResolvedValueOnce({ ok: true });
+      (global.fetch as jest.Mock).mockClear();
+      let callCount = 0;
+      (global.fetch as jest.Mock).mockImplementation(async (url: string) => {
+        if (url.includes(endpoint)) {
+          const currentCount = ++callCount;
+          return {
+            ok: true,
+            json: async () => ({
+              presignedUrl: `url${currentCount}`,
+              key: `key${currentCount}`,
+              bucket: 'bucket',
+            }),
+          };
+        }
+        return { ok: true };
+      });
 
       await PresignedUploader.uploadMultipleWithPresignedUrl(
         files,
@@ -222,21 +230,22 @@ describe('PresignedUploader', () => {
       );
       const endpoint = '/api/v1/photos/upload';
 
-      // すべてのfetchコールをモック
-      for (let i = 0; i < 10; i++) {
-        (global.fetch as jest.Mock).mockResolvedValueOnce(
-          i % 2 === 0
-            ? {
-                ok: true,
-                json: async () => ({
-                  presignedUrl: `url${i}`,
-                  key: `key${i}`,
-                  bucket: 'bucket',
-                }),
-              }
-            : { ok: true }
-        );
-      }
+      (global.fetch as jest.Mock).mockClear();
+      let callCount = 0;
+      (global.fetch as jest.Mock).mockImplementation(async (url: string) => {
+        if (url.includes(endpoint)) {
+          const currentCount = ++callCount;
+          return {
+            ok: true,
+            json: async () => ({
+              presignedUrl: `url${currentCount}`,
+              key: `key${currentCount}`,
+              bucket: 'bucket',
+            }),
+          };
+        }
+        return { ok: true };
+      });
 
       await PresignedUploader.uploadMultipleWithPresignedUrl(
         files,
@@ -245,7 +254,7 @@ describe('PresignedUploader', () => {
         2 // 最大2並列
       );
 
-      // fetchが正しい回数呼ばれたことを確認（各ファイルにつき2回）
+      // fetchが正しい回数呼ばれたことを確認（各ファイルにつき2回: Presigned URL取得 + S3アップロード）
       expect(global.fetch).toHaveBeenCalledTimes(10);
     });
   });
