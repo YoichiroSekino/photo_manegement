@@ -14,6 +14,7 @@ from sqlalchemy import (
     ForeignKey,
     JSON,
     BigInteger,
+    Float,
 )
 from sqlalchemy.orm import relationship, declarative_base
 
@@ -56,10 +57,19 @@ class Photo(Base):
     # タグ
     tags = Column(JSON, nullable=True)
 
+    # 重複検出用
+    perceptual_hash = Column(String(64), nullable=True, index=True)  # 画像ハッシュ
+    duplicate_group_id = Column(String(36), nullable=True, index=True)  # 重複グループID
+
+    # 品質評価
+    quality_score = Column(Integer, nullable=True)  # 品質スコア（0-100）
+    quality_issues = Column(JSON, nullable=True)  # 品質問題の詳細
+
     # ステータス
     is_processed = Column(Boolean, default=False)
     is_representative = Column(Boolean, default=False)  # 代表写真
     is_submission_frequency = Column(Boolean, default=False)  # 提出頻度写真
+    is_duplicate = Column(Boolean, default=False)  # 重複フラグ
 
     # タイムスタンプ
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
@@ -90,6 +100,29 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email='{self.email}')>"
+
+
+class PhotoDuplicate(Base):
+    """写真重複関係テーブル"""
+
+    __tablename__ = "photo_duplicates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    photo1_id = Column(Integer, ForeignKey("photos.id"), nullable=False, index=True)
+    photo2_id = Column(Integer, ForeignKey("photos.id"), nullable=False, index=True)
+    similarity_score = Column(Float, nullable=False)  # 類似度スコア（0.0-1.0）
+    duplicate_type = Column(String(50), nullable=True)  # 重複タイプ（exact, similar, etc.）
+    status = Column(String(20), default="pending", nullable=False)  # pending, confirmed, rejected
+    confirmed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    confirmed_at = Column(DateTime, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<PhotoDuplicate(id={self.id}, photo1_id={self.photo1_id}, photo2_id={self.photo2_id}, similarity={self.similarity_score})>"
 
 
 class Project(Base):

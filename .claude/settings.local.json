@@ -59,7 +59,9 @@
       "Bash(test:*)",
       "Bash(./venv/Scripts/python:*)",
       "Bash(./venv/Scripts/alembic:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(gh issue close:*)"
     ],
     "deny": [],
     "ask": []
