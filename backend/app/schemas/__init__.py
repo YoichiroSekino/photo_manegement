@@ -32,6 +32,11 @@ from app.schemas.title import (
     TitleGenerationResponse,
     TitleUpdateRequest,
 )
+from app.schemas.photo_xml import (
+    PhotoXMLGenerationRequest,
+    PhotoXMLGenerationResponse,
+    PhotoXMLValidationResponse,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -55,4 +60,7 @@ __all__ = [
     "TitleGenerationRequest",
     "TitleGenerationResponse",
     "TitleUpdateRequest",
+    "PhotoXMLGenerationRequest",
+    "PhotoXMLGenerationResponse",
+    "PhotoXMLValidationResponse",
 ]
