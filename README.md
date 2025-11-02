@@ -1,16 +1,16 @@
 # 工事写真自動整理システム (Construction Photo Management System)
 
-**Phase 2 Week 13-14 完了！** 🚀 (v0.2.1 - 2025-11-02)
+**Phase 2 完成！** 🎉 (v0.3.0 - 2025-11-02)
 
-[![Tests](https://img.shields.io/badge/tests-57%20passed-success)](./backend/tests)
-[![Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen)](./backend/htmlcov)
+[![Tests](https://img.shields.io/badge/tests-86%20passed-success)](./backend/tests)
+[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](./backend/htmlcov)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
 [![AWS](https://img.shields.io/badge/AWS-Rekognition-orange)](https://aws.amazon.com/rekognition/)
 
-> **最新情報**: Phase 2 AI機能強化が進行中！重複写真検出機能を実装し、Perceptual Hash（pHash）アルゴリズムで視覚的に類似した写真を自動検出・グループ化できるようになりました。詳細は [PHASE2_WEEK13-14_RELEASE.md](./PHASE2_WEEK13-14_RELEASE.md) をご覧ください。
+> **最新情報**: Phase 2 AI機能強化が完成！画質判定機能とタイトル自動生成機能を実装し、OCRデータと画像分類を統合した完全自動整理システムが実現しました。詳細は [PHASE2_WEEK15-18_RELEASE.md](./PHASE2_WEEK15-18_RELEASE.md) をご覧ください。
 
 ## 🚀 クイックスタート
 
@@ -45,14 +45,14 @@ cd frontend && npm install && npm run dev
 | ✅ データベース設計 | 完了 | - | 100% |
 | ✅ フロントエンド基盤 | 完了 | 19/19 | 100% |
 
-### Phase 2 AI機能強化（進行中）
+### Phase 2 AI機能強化（完了）
 
 | 機能 | ステータス | テスト | カバレッジ |
 |------|-----------|--------|-----------|
 | ✅ 画像分類（Rekognition） | **完了** | 13/13 | 97% |
 | ✅ 重複写真検出 | **完了** | 12/12 | 97% |
-| 🔄 画質判定 | Week 15-16 | - | - |
-| 🔄 自動タイトル生成 | Week 17-18 | - | - |
+| ✅ 画質判定 | **完了** | 13/13 | 91% |
+| ✅ 自動タイトル生成 | **完了** | 16/16 | 92% |
 
 ### Phase 3（予定）
 

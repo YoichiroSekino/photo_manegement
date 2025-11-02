@@ -46,7 +46,8 @@
       "Bash(do sleep 3)",
       "Bash(done)",
       "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing)",
-      "Bash(./venv/Scripts/pytest tests/test_title_generation_service.py -v)"
+      "Bash(./venv/Scripts/pytest tests/test_title_generation_service.py -v)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
