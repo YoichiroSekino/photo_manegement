@@ -15,7 +15,9 @@ from sqlalchemy import (
     JSON,
     BigInteger,
     Float,
+    Index,
 )
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -57,6 +59,14 @@ class Photo(Base):
     # タグ
     tags = Column(JSON, nullable=True)
 
+    # OCR情報
+    ocr_text = Column(Text, nullable=True)  # OCR抽出テキスト
+    ocr_confidence = Column(Float, nullable=True)  # OCR信頼度（0.0-1.0）
+    ocr_metadata = Column(JSON, nullable=True)  # OCR詳細メタデータ
+
+    # 全文検索用（PostgreSQL TSVector）
+    search_vector = Column(TSVECTOR, nullable=True)
+
     # 重複検出用
     perceptual_hash = Column(String(64), nullable=True, index=True)  # 画像ハッシュ
     duplicate_group_id = Column(String(36), nullable=True, index=True)  # 重複グループID
@@ -79,6 +89,10 @@ class Photo(Base):
 
     def __repr__(self) -> str:
         return f"<Photo(id={self.id}, file_name='{self.file_name}')>"
+
+
+# GINインデックス（全文検索用）
+Index("ix_photos_search_vector", Photo.search_vector, postgresql_using="gin")
 
 
 class User(Base):

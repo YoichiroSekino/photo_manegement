@@ -6,7 +6,7 @@ from typing import Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func
 
 from app.database.database import get_db
 from app.database.models import Photo
@@ -49,16 +49,15 @@ async def search_photos(
     """
     query = db.query(Photo)
 
-    # キーワード検索
+    # キーワード検索（全文検索）
     if keyword:
-        keyword_filter = or_(
-            Photo.file_name.contains(keyword),
-            Photo.title.contains(keyword),
-            Photo.description.contains(keyword),
-            Photo.work_type.contains(keyword),
-            Photo.work_kind.contains(keyword),
+        # TSVectorを使った全文検索（高速）
+        ts_query = func.plainto_tsquery('simple', keyword)
+        query = query.filter(Photo.search_vector.op('@@')(ts_query))
+        # 関連度順にソート
+        query = query.order_by(
+            func.ts_rank(Photo.search_vector, ts_query).desc()
         )
-        query = query.filter(keyword_filter)
 
     # 工種フィルタ
     if work_type:
@@ -96,8 +95,11 @@ async def search_photos(
     skip = (page - 1) * page_size
     total_pages = (total + page_size - 1) // page_size
 
-    # データ取得（作成日時降順）
-    photos = query.order_by(Photo.created_at.desc()).offset(skip).limit(page_size).all()
+    # データ取得（キーワードがない場合は作成日時降順）
+    if not keyword:
+        query = query.order_by(Photo.created_at.desc())
+
+    photos = query.offset(skip).limit(page_size).all()
 
     return SearchResponse(
         items=photos,
