@@ -1,6 +1,6 @@
 # 工事写真自動整理システム API ドキュメント
 
-**バージョン**: 0.2.0 (Phase 2 - AI機能強化)
+**バージョン**: 0.2.1 (Phase 2 - AI機能強化)
 **最終更新**: 2025-11-02
 
 ---
@@ -13,9 +13,10 @@
 4. [写真管理API](#写真管理api)
 5. [OCR処理API](#ocr処理api)
 6. [画像分類API](#画像分類api)
-7. [検索API](#検索api)
-8. [エラーレスポンス](#エラーレスポンス)
-9. [データモデル](#データモデル)
+7. [重複写真検出API](#重複写真検出api)
+8. [検索API](#検索api)
+9. [エラーレスポンス](#エラーレスポンス)
+10. [データモデル](#データモデル)
 
 ---
 
@@ -73,6 +74,14 @@ Phase 1 MVPでは認証は実装されていません。Phase 2で実装予定�
 |---------|--------------|------|
 | POST | `/photos/{id}/classify` | 画像分類を実行 |
 | GET | `/photos/{id}/classification` | 分類結果を取得 |
+
+### 重複写真検出
+
+| メソッド | エンドポイント | 説明 |
+|---------|--------------|------|
+| POST | `/photos/detect-duplicates` | 全写真から重複を検出 |
+| POST | `/photos/{id}/calculate-hash` | 写真のpHashを計算 |
+| GET | `/photos/{id}/hash` | 計算済みpHashを取得 |
 
 ### 検索
 
@@ -399,6 +408,163 @@ Amazon Rekognitionを使用して写真から物体・シーン・作業員・�
 
 ---
 
+## 重複写真検出API
+
+### 全写真から重複を検出
+
+Perceptual Hash（pHash）アルゴリズムを使用して、視覚的に類似した写真を検出しグループ化します。
+
+**エンドポイント**: `POST /api/v1/photos/detect-duplicates`
+
+**クエリパラメータ**:
+
+| パラメータ | 型 | デフォルト | 説明 |
+|-----------|---|-----------|------|
+| similarity_threshold | float | 90.0 | 類似度閾値（70.0-100.0） |
+
+**レスポンス**: `200 OK`
+
+```json
+{
+  "total_photos": 100,
+  "duplicate_groups": [
+    {
+      "group_id": 1,
+      "photos": [
+        {
+          "id": 1,
+          "file_name": "photo001.jpg",
+          "phash": "a1b2c3d4e5f60789",
+          "similarity": null
+        },
+        {
+          "id": 45,
+          "file_name": "photo045.jpg",
+          "phash": "a1b2c3d4e5f6078a",
+          "similarity": 95.3
+        }
+      ],
+      "avg_similarity": 95.3,
+      "photo_count": 2
+    },
+    {
+      "group_id": 2,
+      "photos": [
+        {
+          "id": 10,
+          "file_name": "photo010.jpg",
+          "phash": "b2c3d4e5f6078abc",
+          "similarity": null
+        },
+        {
+          "id": 23,
+          "file_name": "photo023.jpg",
+          "phash": "b2c3d4e5f6078abd",
+          "similarity": 92.7
+        },
+        {
+          "id": 67,
+          "file_name": "photo067.jpg",
+          "phash": "b2c3d4e5f6078abe",
+          "similarity": 91.8
+        }
+      ],
+      "avg_similarity": 92.25,
+      "photo_count": 3
+    }
+  ],
+  "summary": {
+    "total_groups": 2,
+    "total_duplicate_photos": 5,
+    "avg_similarity": 93.76,
+    "largest_group_size": 3
+  }
+}
+```
+
+**アルゴリズム詳細**:
+
+1. **pHash計算**: 各写真を8x8グリッド（64ビット）でハッシュ化
+2. **ハミング距離**: 2つのハッシュ間の異なるビット数を計算
+3. **類似度**: `(1 - ハミング距離 / 64) × 100` で算出
+4. **グループ化**: 類似度が閾値以上の写真をグループ化
+
+**閾値の目安**:
+
+- **90-100%**: ほぼ同一の写真（リサイズ、軽微な圧縮の違い）
+- **80-90%**: 非常に類似（明るさ調整、トリミング）
+- **70-80%**: 類似（同じシーン、異なるアングル）
+
+### 写真のpHashを計算
+
+指定された写真のPerceptual Hash（pHash）を計算します。
+
+**エンドポイント**: `POST /api/v1/photos/{id}/calculate-hash`
+
+**パスパラメータ**:
+
+| パラメータ | 型 | 説明 |
+|-----------|---|------|
+| id | integer | 写真ID |
+
+**レスポンス**: `200 OK`
+
+```json
+{
+  "photo_id": 1,
+  "phash": "a1b2c3d4e5f60789",
+  "status": "completed"
+}
+```
+
+**エラーレスポンス**: `404 Not Found`
+
+```json
+{
+  "detail": "写真が見つかりません（ID: 999）"
+}
+```
+
+**エラーレスポンス**: `500 Internal Server Error`
+
+```json
+{
+  "detail": "ハッシュ計算に失敗しました: S3 download error"
+}
+```
+
+### 計算済みpHashを取得
+
+写真に保存されているpHashを取得します。
+
+**エンドポイント**: `GET /api/v1/photos/{id}/hash`
+
+**パスパラメータ**:
+
+| パラメータ | 型 | 説明 |
+|-----------|---|------|
+| id | integer | 写真ID |
+
+**レスポンス（計算済み）**: `200 OK`
+
+```json
+{
+  "photo_id": 1,
+  "phash": "a1b2c3d4e5f60789",
+  "status": "exists"
+}
+```
+
+**エラーレスポンス（未計算）**: `404 Not Found`
+
+```json
+{
+  "detail": "pHashが計算されていません。先に計算してください。"
+}
+```
+
+---
+
 ## 検索API
 
 ### 写真を検索
@@ -582,6 +748,53 @@ interface ClassificationSummary {
 }
 ```
 
+### DuplicatePhotoInfo
+
+```typescript
+interface DuplicatePhotoInfo {
+  id: number;              // 写真ID
+  file_name: string;       // ファイル名
+  phash: string;           // pHash（16進数文字列、16文字）
+  similarity: number | null;  // 類似度（%）。グループ内の最初の写真はnull
+}
+```
+
+### DuplicateGroupResponse
+
+```typescript
+interface DuplicateGroupResponse {
+  group_id: number;                     // グループID（1から始まる連番）
+  photos: DuplicatePhotoInfo[];        // グループ内の写真リスト
+  avg_similarity: number;              // グループ内平均類似度（%）
+  photo_count: number;                 // グループ内写真数
+}
+```
+
+### DuplicateDetectionResponse
+
+```typescript
+interface DuplicateDetectionResponse {
+  total_photos: number;                    // 検出対象写真総数
+  duplicate_groups: DuplicateGroupResponse[];  // 重複グループリスト
+  summary: {
+    total_groups: number;                  // 総グループ数
+    total_duplicate_photos: number;        // 重複写真総数
+    avg_similarity: number;                // 全体平均類似度（%）
+    largest_group_size: number;            // 最大グループサイズ
+  };
+}
+```
+
+### CalculateHashResponse
+
+```typescript
+interface CalculateHashResponse {
+  photo_id: number;  // 写真ID
+  phash: string;     // 計算されたpHash（16進数文字列、16文字）
+  status: string;    // ステータス（"completed" or "exists"）
+}
+```
+
 ---
 
 ## 使用例
@@ -654,12 +867,56 @@ curl "http://localhost:8000/api/v1/photos/search?date_from=2024-03-01&date_to=20
 curl "http://localhost:8000/api/v1/photos/search?keyword=配筋&work_type=基礎工&date_from=2024-03-01&page_size=50"
 ```
 
+### シナリオ4: 重複写真検出
+
+```bash
+# 1. 写真メタデータを登録（複数枚）
+curl -X POST http://localhost:8000/api/v1/photos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_name": "photo001.jpg",
+    "file_size": 2048000,
+    "mime_type": "image/jpeg",
+    "s3_key": "photos/photo001.jpg"
+  }'
+# レスポンス: {"id": 1, ...}
+
+curl -X POST http://localhost:8000/api/v1/photos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_name": "photo002.jpg",
+    "file_size": 2100000,
+    "mime_type": "image/jpeg",
+    "s3_key": "photos/photo002.jpg"
+  }'
+# レスポンス: {"id": 2, ...}
+
+# 2. 各写真のpHashを計算
+curl -X POST http://localhost:8000/api/v1/photos/1/calculate-hash
+# レスポンス: {"photo_id": 1, "phash": "a1b2c3d4e5f60789", "status": "completed"}
+
+curl -X POST http://localhost:8000/api/v1/photos/2/calculate-hash
+# レスポンス: {"photo_id": 2, "phash": "a1b2c3d4e5f6078a", "status": "completed"}
+
+# 3. 計算済みpHashを確認
+curl http://localhost:8000/api/v1/photos/1/hash
+# レスポンス: {"photo_id": 1, "phash": "a1b2c3d4e5f60789", "status": "exists"}
+
+# 4. 重複検出を実行（デフォルト閾値90%）
+curl -X POST "http://localhost:8000/api/v1/photos/detect-duplicates"
+# レスポンス: 重複グループリスト、サマリー情報
+
+# 5. カスタム閾値で重複検出（85%）
+curl -X POST "http://localhost:8000/api/v1/photos/detect-duplicates?similarity_threshold=85"
+# レスポンス: より多くの類似写真がグループ化される
+```
+
 ---
 
 ## 次のステップ（Phase 2予定）
 
 - ✅ 画像分類AI統合（Rekognition）- **完了**
-- 重複写真検出
+- ✅ 重複写真検出 - **完了**
 - 画質・品質自動判定
 - 自動タイトル生成
 - 認証・認可機能（JWT）
@@ -670,4 +927,4 @@ curl "http://localhost:8000/api/v1/photos/search?keyword=配筋&work_type=基礎
 ---
 
 **ドキュメント作成日**: 2025-11-02
-**Phase 2 - Week 11-12: Amazon Rekognition統合完了**
+**Phase 2 - Week 13-14: 重複写真検出機能完了**
