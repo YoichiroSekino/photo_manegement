@@ -5,7 +5,7 @@ FastAPI メインアプリケーション
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import __version__
-from app.routers import photos, ocr, search, rekognition, duplicate, quality, title, photo_xml, export
+from app.routers import photos, ocr, search, rekognition, duplicate, quality, title, photo_xml, export, photo_album
 
 # FastAPIアプリケーション初期化
 app = FastAPI(
@@ -24,6 +24,7 @@ app.add_middleware(
 )
 
 # ルーター登録（順序重要: 具体的なパスを先に登録）
+app.include_router(photo_album.router)  # /api/v1/photo-album/generate-pdf
 app.include_router(export.router)  # /api/v1/export/package
 app.include_router(photo_xml.router)  # /api/v1/photo-xml/generate
 app.include_router(search.router)  # /api/v1/photos/search

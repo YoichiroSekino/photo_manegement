@@ -43,6 +43,12 @@ from app.schemas.export import (
     ExportValidationResponse,
     FileRenameInfo,
 )
+from app.schemas.photo_album import (
+    PhotoAlbumGenerationRequest,
+    PhotoAlbumGenerationResponse,
+    CoverData,
+    LayoutType,
+)
 
 __all__ = [
     "PhotoCreate",
@@ -73,4 +79,8 @@ __all__ = [
     "ExportResponse",
     "ExportValidationResponse",
     "FileRenameInfo",
+    "PhotoAlbumGenerationRequest",
+    "PhotoAlbumGenerationResponse",
+    "CoverData",
+    "LayoutType",
 ]
