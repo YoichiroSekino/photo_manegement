@@ -8,7 +8,7 @@ export default function ExportPage() {
   const [showExportWizard, setShowExportWizard] = useState(false);
   const [showPhotoAlbum, setShowPhotoAlbum] = useState(false);
 
-  const handleExport = async (selectedPhotoIds: number[], options: ExportOptions) => {
+  const handleExport = async (selectedPhotoIds: string[], options: ExportOptions) => {
     const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     try {
@@ -18,7 +18,7 @@ export default function ExportPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          photo_ids: selectedPhotoIds,
+          photo_ids: selectedPhotoIds.map(id => parseInt(id, 10)),  // Convert string IDs to numbers for API
           include_xml: options.includeXml,
           include_dtd: options.includeDtd,
           include_xsl: options.includeXsl,

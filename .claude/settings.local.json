@@ -47,7 +47,19 @@
       "Bash(done)",
       "Bash(./venv/Scripts/pytest --cov=app --cov-report=term-missing)",
       "Bash(./venv/Scripts/pytest tests/test_title_generation_service.py -v)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(./venv/Scripts/pytest tests/test_photo_xml_generator.py -v)",
+      "Bash(git log:*)",
+      "Bash(./venv/Scripts/pytest tests/test_export_service.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_photo_album_generator.py -v)",
+      "Bash(./venv/Scripts/pytest tests/test_photo_album_generator.py -v --tb=short)",
+      "Bash(for i in 2 3 4 5 6 7 8 9 10 11 12)",
+      "Bash(do echo \"=== Issue #$i ===\")",
+      "Bash(python:*)",
+      "Bash(test:*)",
+      "Bash(./venv/Scripts/python:*)",
+      "Bash(./venv/Scripts/alembic:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

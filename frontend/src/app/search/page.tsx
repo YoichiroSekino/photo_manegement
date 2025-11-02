@@ -1,82 +1,51 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { SearchBar } from '@/components/search/SearchBar';
 import { FilterPanel, FilterOptions } from '@/components/search/FilterPanel';
 import { PhotoGrid } from '@/components/photos/PhotoGrid';
-import { Photo } from '@/types/photo';
+import { useSearchPhotos } from '@/hooks/usePhotos';
+import { useFilterStore } from '@/store/filterStore';
 
 export default function SearchPage() {
-  const [keyword, setKeyword] = useState('');
-  const [filters, setFilters] = useState<FilterOptions>({});
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [totalResults, setTotalResults] = useState(0);
+  const { mutate: searchPhotos, data: searchResult, isPending, error } = useSearchPhotos();
 
-  const handleSearch = useCallback(async (searchKeyword: string) => {
-    setKeyword(searchKeyword);
-    await performSearch(searchKeyword, filters);
-  }, [filters]);
+  const filters = useFilterStore((state) => state.filters);
+  const setFilter = useFilterStore((state) => state.setFilter);
+  const setFilters = useFilterStore((state) => state.setFilters);
 
-  const handleFilterChange = useCallback(async (newFilters: FilterOptions) => {
-    setFilters(newFilters);
-    await performSearch(keyword, newFilters);
-  }, [keyword]);
+  const performSearch = useCallback(() => {
+    searchPhotos({
+      searchQuery: filters.searchQuery,
+      workType: filters.workType,
+      majorCategory: filters.majorCategory,
+      photoType: filters.photoType,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      location: filters.location,
+      photographer: filters.photographer,
+    });
+  }, [filters, searchPhotos]);
 
-  const performSearch = async (searchKeyword: string, searchFilters: FilterOptions) => {
-    setIsLoading(true);
-    setError(null);
+  const handleSearch = useCallback((searchKeyword: string) => {
+    setFilter('searchQuery', searchKeyword);
+  }, [setFilter]);
 
-    try {
-      const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const params = new URLSearchParams();
+  const handleFilterChange = useCallback((newFilters: FilterOptions) => {
+    setFilters({
+      ...filters,
+      workType: newFilters.workType,
+      majorCategory: newFilters.majorCategory,
+      photoType: newFilters.photoType,
+      startDate: newFilters.dateFrom,
+      endDate: newFilters.dateTo,
+    });
+  }, [filters, setFilters]);
 
-      if (searchKeyword) {
-        params.append('keyword', searchKeyword);
-      }
-      if (searchFilters.workType) {
-        params.append('work_type', searchFilters.workType);
-      }
-      if (searchFilters.workKind) {
-        params.append('work_kind', searchFilters.workKind);
-      }
-      if (searchFilters.majorCategory) {
-        params.append('major_category', searchFilters.majorCategory);
-      }
-      if (searchFilters.photoType) {
-        params.append('photo_type', searchFilters.photoType);
-      }
-      if (searchFilters.dateFrom) {
-        params.append('date_from', searchFilters.dateFrom);
-      }
-      if (searchFilters.dateTo) {
-        params.append('date_to', searchFilters.dateTo);
-      }
-
-      const response = await fetch(`${apiEndpoint}/api/v1/photos/search?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('検索に失敗しました');
-      }
-
-      const data = await response.json();
-      setPhotos(data.items || []);
-      setTotalResults(data.total || 0);
-    } catch (err) {
-      console.error('Search error:', err);
-      setError('検索中にエラーが発生しました。もう一度お試しください。');
-      setPhotos([]);
-      setTotalResults(0);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 初回ロード時にすべての写真を取得
+  // フィルター変更時に自動検索
   useEffect(() => {
-    performSearch('', {});
-  }, []);
+    performSearch();
+  }, [performSearch]);
 
   return (
     <main className="flex min-h-screen flex-col p-8">
@@ -93,11 +62,11 @@ export default function SearchPage() {
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700">検索中にエラーが発生しました</p>
           </div>
         )}
 
-        {isLoading ? (
+        {isPending ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
@@ -105,12 +74,12 @@ export default function SearchPage() {
           <>
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-gray-600">
-                {totalResults}件の写真が見つかりました
+                {searchResult?.length || 0}件の写真が見つかりました
               </p>
             </div>
 
-            {photos.length > 0 ? (
-              <PhotoGrid photos={photos} />
+            {searchResult && searchResult.length > 0 ? (
+              <PhotoGrid photos={searchResult} />
             ) : (
               <div className="text-center py-12">
                 <svg
