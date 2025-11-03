@@ -7,6 +7,13 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.amazonaws.com',
       },
+      // 開発環境用：ローカルバックエンド
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/static/uploads/**',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     // 画像キャッシュ最適化
