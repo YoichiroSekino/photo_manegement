@@ -28,6 +28,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName?: string) => Promise<void>;
+  mockLogin: () => Promise<void>;
   logout: () => void;
 }
 
@@ -155,6 +156,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await login(email, password);
   };
 
+  const mockLogin = async () => {
+    const response = await fetch(`${apiEndpoint}/api/v1/auth/mock-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Mock login failed');
+    }
+
+    const data = await response.json();
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+
+    // ユーザー情報を取得
+    const userResponse = await fetch(`${apiEndpoint}/api/v1/auth/me`, {
+      headers: {
+        Authorization: `Bearer ${data.access_token}`,
+      },
+    });
+
+    if (userResponse.ok) {
+      const userData = await userResponse.json();
+      setUser(userData);
+
+      // 組織情報も取得
+      if (userData.organization_id) {
+        const orgResponse = await fetch(`${apiEndpoint}/api/v1/organizations/${userData.organization_id}`, {
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+          },
+        });
+        if (orgResponse.ok) {
+          const orgData = await orgResponse.json();
+          setOrganization(orgData);
+        }
+      }
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -169,6 +213,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     login,
     register,
+    mockLogin,
     logout,
   };
 

@@ -74,6 +74,15 @@ class Photo(Base):
     )
     organization = relationship("Organization")
 
+    # プロジェクト関連
+    project_id = Column(
+        Integer,
+        ForeignKey("projects.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
+    )
+    project = relationship("Project", back_populates="photos")
+
     file_name = Column(String(255), nullable=False)
     file_size = Column(BigInteger, nullable=False)
     mime_type = Column(String(100), nullable=False)
@@ -233,6 +242,9 @@ class Project(Base):
     client_name = Column(String(255), nullable=True)
     start_date = Column(DateTime, nullable=True)
     end_date = Column(DateTime, nullable=True)
+
+    # 写真との関連
+    photos = relationship("Photo", back_populates="project")
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(

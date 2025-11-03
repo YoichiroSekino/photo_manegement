@@ -18,6 +18,9 @@ export const PhotoCard: FC<PhotoCardProps> = ({ photo, onSelect }) => {
     onSelect?.(photo.id);
   }, [photo.id, onSelect]);
 
+  // サムネイルURLを決定（thumbnailUrl > s3_url）
+  const imageUrl = photo.thumbnailUrl || photo.s3Url;
+
   return (
     <div
       data-testid="photo-card"
@@ -26,9 +29,9 @@ export const PhotoCard: FC<PhotoCardProps> = ({ photo, onSelect }) => {
     >
       {/* サムネイル画像 */}
       <div className="relative aspect-video bg-gray-100">
-        {photo.thumbnailUrl ? (
+        {imageUrl ? (
           <Image
-            src={photo.thumbnailUrl}
+            src={imageUrl}
             alt={photo.title || photo.fileName}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-200"

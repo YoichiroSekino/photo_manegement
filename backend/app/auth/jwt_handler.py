@@ -5,11 +5,8 @@ JWT トークン処理
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 import os
-
-# パスワードハッシュ化コンテキスト
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT設定
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-here-change-in-production")
@@ -92,7 +89,10 @@ class JWTHandler:
         Returns:
             検証結果
         """
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(
+            plain_password.encode('utf-8'),
+            hashed_password.encode('utf-8')
+        )
 
     @staticmethod
     def get_password_hash(password: str) -> str:
@@ -105,7 +105,9 @@ class JWTHandler:
         Returns:
             ハッシュ化されたパスワード
         """
-        return pwd_context.hash(password)
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed.decode('utf-8')
 
 
 def create_tokens(user_id: int, email: str, organization_id: int) -> Dict[str, str]:

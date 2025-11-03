@@ -97,3 +97,14 @@ export async function apiPatch<T>(endpoint: string, data?: any): Promise<T> {
 export async function apiDelete<T>(endpoint: string): Promise<T> {
   return apiFetch<T>(endpoint, { method: 'DELETE' });
 }
+
+/**
+ * API Client object for convenience
+ */
+export const apiClient = {
+  get: apiGet,
+  post: apiPost,
+  put: apiPut,
+  patch: apiPatch,
+  delete: apiDelete,
+};

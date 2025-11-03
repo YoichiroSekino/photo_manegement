@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, register } = useAuth();
+  const { login, register, mockLogin } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,6 +28,20 @@ export default function LoginPage() {
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '処理に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMockLogin = async () => {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await mockLogin();
+      router.push('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'モックログインに失敗しました');
     } finally {
       setIsLoading(false);
     }
@@ -135,6 +149,20 @@ export default function LoginPage() {
             >
               {isLogin ? 'アカウントを作成' : 'すでにアカウントをお持ちの方'}
             </button>
+          </div>
+
+          <div className="border-t border-gray-300 pt-4">
+            <button
+              type="button"
+              onClick={handleMockLogin}
+              disabled={isLoading}
+              className="group relative flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-100"
+            >
+              開発用モックログイン
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              ※開発環境でのみ使用可能です
+            </p>
           </div>
         </form>
       </div>

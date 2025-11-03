@@ -8,9 +8,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
-from app.database.models import Base
+from app.database.models import Base, Organization, User
 from app.database.database import get_db
 from app.main import app
+from app.auth.jwt_handler import create_tokens
 
 # テスト用インメモリデータベース（全テストで共有するため、check_same_thread=Falseが必要）
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -60,3 +61,35 @@ def client(db):
     finally:
         # クリーンアップ
         app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def test_org(db):
+    """テスト用組織"""
+    org = Organization(name="Test Company", subdomain="testcompany", is_active=True)
+    db.add(org)
+    db.commit()
+    db.refresh(org)
+    return org
+
+
+@pytest.fixture
+def test_user(db, test_org):
+    """テスト用ユーザー"""
+    user = User(
+        email="test@testcompany.com",
+        hashed_password="hashed",
+        organization_id=test_org.id,
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def auth_headers(test_user):
+    """認証ヘッダー"""
+    tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
+    return {"Authorization": f"Bearer {tokens['access_token']}"}

@@ -49,6 +49,18 @@ export default function PhotosPage() {
   return (
     <main className="flex min-h-screen flex-col p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto w-full">
+        {/* Navigation breadcrumb */}
+        <nav className="mb-4 flex items-center space-x-2 text-sm">
+          <button
+            onClick={() => router.push('/')}
+            className="text-blue-600 hover:text-blue-700 hover:underline"
+          >
+            ダッシュボード
+          </button>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-600">写真一覧</span>
+        </nav>
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">写真一覧</h1>

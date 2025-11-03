@@ -71,6 +71,8 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     Raises:
         HTTPException: メールアドレスが既に登録されている場合
     """
+    from app.database.models import Organization
+
     # メールアドレスの重複チェック
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
@@ -78,6 +80,18 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="このメールアドレスは既に登録されています",
         )
+
+    # デフォルト組織を取得または作成
+    default_org = db.query(Organization).filter(Organization.subdomain == "default").first()
+    if not default_org:
+        default_org = Organization(
+            name="デフォルト組織",
+            subdomain="default",
+            is_active=True
+        )
+        db.add(default_org)
+        db.commit()
+        db.refresh(default_org)
 
     # パスワードをハッシュ化
     hashed_password = JWTHandler.get_password_hash(user_data.password)
@@ -87,6 +101,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
         email=user_data.email,
         hashed_password=hashed_password,
         full_name=user_data.full_name,
+        organization_id=default_org.id,
         is_active=True,
         is_superuser=False,
     )
@@ -140,7 +155,7 @@ async def login(
         )
 
     # トークンを作成
-    tokens = create_tokens(user.id, user.email)
+    tokens = create_tokens(user.id, user.email, user.organization_id)
     return tokens
 
 
@@ -212,5 +227,59 @@ async def refresh_token(
         )
 
     # 新しいトークンを作成
-    tokens = create_tokens(user.id, user.email)
+    tokens = create_tokens(user.id, user.email, user.organization_id)
+    return tokens
+
+
+@router.post("/mock-login", response_model=TokenResponse)
+async def mock_login(db: Session = Depends(get_db)):
+    """
+    開発環境専用：パスワード不要でログイン
+
+    既存のユーザーまたはデフォルトユーザーでログインします。
+    本番環境では無効化してください。
+
+    Returns:
+        アクセストークンとリフレッシュトークン
+    """
+    import os
+
+    # 本番環境では使用不可
+    if os.getenv("ENVIRONMENT") == "production":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="このエンドポイントは開発環境でのみ使用可能です",
+        )
+
+    from app.database.models import Organization
+
+    # デフォルト組織を取得または作成
+    default_org = db.query(Organization).filter(Organization.subdomain == "default").first()
+    if not default_org:
+        default_org = Organization(
+            name="デフォルト組織",
+            subdomain="default",
+            is_active=True
+        )
+        db.add(default_org)
+        db.commit()
+        db.refresh(default_org)
+
+    # 既存のユーザーを取得、なければ作成
+    user = db.query(User).filter(User.email == "test@example.com").first()
+    if not user:
+        user = User(
+            email="test@example.com",
+            hashed_password="mock_password_hash",  # モック用のダミーハッシュ
+            full_name="テストユーザー",
+            organization_id=default_org.id,
+            is_active=True,
+            is_superuser=False,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    # トークンを作成
+    tokens = create_tokens(user.id, user.email, user.organization_id)
     return tokens

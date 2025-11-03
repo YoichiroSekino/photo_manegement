@@ -2,6 +2,11 @@
 FastAPI メインアプリケーション
 """
 
+from dotenv import load_dotenv
+
+# 環境変数を読み込み
+load_dotenv()
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -22,8 +27,12 @@ from app.routers import (
     photo_album,
     auth,
     organizations,
+    projects,
+    dashboard,
 )
 from app.middleware import TenantIdentificationMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 # Rate limiter初期化
 limiter = Limiter(key_func=get_remote_address)
@@ -54,6 +63,8 @@ app.add_middleware(
 # ルーター登録（順序重要: 具体的なパスを先に登録）
 app.include_router(auth.router)  # /api/v1/auth
 app.include_router(organizations.router)  # /api/v1/organizations
+app.include_router(projects.router)  # /api/v1/projects
+app.include_router(dashboard.router)  # /api/v1/dashboard
 app.include_router(photo_album.router)  # /api/v1/photo-album/generate-pdf
 app.include_router(export.router)  # /api/v1/export/package
 app.include_router(photo_xml.router)  # /api/v1/photo-xml/generate
@@ -86,3 +97,13 @@ async def api_info():
         "version": __version__,
         "description": "工事写真自動整理システム バックエンドAPI",
     }
+
+
+# 開発環境用：静的ファイル配信（全ルーター登録後にマウント）
+if os.getenv("USE_MOCK_S3", "true").lower() == "true":
+    # アップロード用ディレクトリ作成
+    uploads_dir = os.path.join(os.path.dirname(__file__), "..", "static", "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+
+    # 静的ファイルをマウント（最後にマウントすることでAPIルートとの競合を防ぐ）
+    app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "..", "static")), name="static")

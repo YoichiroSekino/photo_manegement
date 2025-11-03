@@ -294,16 +294,19 @@ export class PresignedUploader {
       const { presignedUrl, key, bucket } = await response.json();
 
       // 2. Presigned URLに直接アップロード
-      const uploadResponse = await fetch(presignedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
+      // モックURLの場合はスキップ（開発環境）
+      if (!presignedUrl.includes('mock-s3-url')) {
+        const uploadResponse = await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file to S3');
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload file to S3');
+        }
       }
 
       uploadedSize = file.size;

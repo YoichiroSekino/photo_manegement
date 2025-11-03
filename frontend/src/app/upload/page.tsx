@@ -62,55 +62,65 @@ export default function UploadPage() {
 
     try {
       const apiEndpoint = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const uploadEndpoint = `${apiEndpoint}/api/v1/photos/upload`;
-
-      // 認証トークン取得
       const accessToken = localStorage.getItem('access_token');
 
-      const uploadResults = await PresignedUploader.uploadMultipleWithPresignedUrl(
-        selectedFiles,
-        uploadEndpoint,
-        (fileName, progress) => {
-          setUploadStatuses((prev) => {
-            const newStatuses = new Map(prev);
-            const status = newStatuses.get(fileName);
-            if (status) {
-              status.progress = progress;
-              newStatuses.set(fileName, { ...status });
-            }
-            return newStatuses;
-          });
-        },
-        5, // 最大5並列
-        accessToken || undefined
-      );
+      // モックアップロードエンドポイントを使用
+      const mockUploadEndpoint = `${apiEndpoint}/api/v1/photos/mock-upload`;
 
-      // S3アップロード成功後、写真レコードを作成
-      const createPhotoEndpoint = `${apiEndpoint}/api/v1/photos`;
-      for (let i = 0; i < uploadResults.length; i++) {
-        const result = uploadResults[i];
+      for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
 
+        // ステータス更新: uploading
+        setUploadStatuses((prev) => {
+          const newStatuses = new Map(prev);
+          const status = newStatuses.get(file.name);
+          if (status) {
+            status.progress = { ...status.progress, status: 'uploading', percentage: 50 };
+            newStatuses.set(file.name, { ...status });
+          }
+          return newStatuses;
+        });
+
         try {
-          const response = await fetch(createPhotoEndpoint, {
+          // フォームデータ作成
+          const formData = new FormData();
+          formData.append('file', file);
+
+          // アップロード
+          const response = await fetch(mockUploadEndpoint, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
               ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
             },
-            body: JSON.stringify({
-              file_name: file.name,
-              file_size: file.size,
-              mime_type: file.type,
-              s3_key: result.key,
-            }),
+            body: formData,
           });
 
           if (!response.ok) {
-            console.error(`Failed to create photo record for ${file.name}`);
+            throw new Error(`Upload failed for ${file.name}`);
           }
+
+          // ステータス更新: completed
+          setUploadStatuses((prev) => {
+            const newStatuses = new Map(prev);
+            const status = newStatuses.get(file.name);
+            if (status) {
+              status.progress = { ...status.progress, status: 'completed', percentage: 100 };
+              newStatuses.set(file.name, { ...status });
+            }
+            return newStatuses;
+          });
         } catch (error) {
-          console.error(`Error creating photo record for ${file.name}:`, error);
+          console.error(`Upload error for ${file.name}:`, error);
+          // ステータス更新: error
+          setUploadStatuses((prev) => {
+            const newStatuses = new Map(prev);
+            const status = newStatuses.get(file.name);
+            if (status) {
+              status.progress = { ...status.progress, status: 'error', error: 'アップロード失敗' };
+              newStatuses.set(file.name, { ...status });
+            }
+            return newStatuses;
+          });
         }
       }
 
