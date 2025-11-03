@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProjects } from '@/hooks/useProjects';
 import { DragDropZone } from '@/components/upload/DragDropZone';
 import { validateFiles, getValidFiles, getErrorMessages } from '@/lib/fileValidator';
 import { PresignedUploader, UploadProgress } from '@/lib/s3Upload';
@@ -15,10 +16,19 @@ interface FileUploadStatus {
 export default function UploadPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: projects, isLoading: projectsLoading } = useProjects();
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatuses, setUploadStatuses] = useState<Map<string, FileUploadStatus>>(new Map());
+
+  // 最初のプロジェクトを自動選択
+  useEffect(() => {
+    if (projects && projects.length > 0 && !selectedProjectId) {
+      setSelectedProjectId(projects[0].id);
+    }
+  }, [projects, selectedProjectId]);
 
   // 認証チェック
   if (!authLoading && !isAuthenticated) {
@@ -41,6 +51,11 @@ export default function UploadPage() {
 
   const handleUpload = useCallback(async () => {
     if (selectedFiles.length === 0) return;
+
+    if (!selectedProjectId) {
+      setErrors(['プロジェクトを選択してください。']);
+      return;
+    }
 
     setIsUploading(true);
     setErrors([]);
@@ -85,6 +100,7 @@ export default function UploadPage() {
           // フォームデータ作成
           const formData = new FormData();
           formData.append('file', file);
+          formData.append('project_id', selectedProjectId.toString());
 
           // アップロード
           const response = await fetch(mockUploadEndpoint, {
@@ -136,7 +152,7 @@ export default function UploadPage() {
     } finally {
       setIsUploading(false);
     }
-  }, [selectedFiles]);
+  }, [selectedFiles, selectedProjectId]);
 
   return (
     <main className="flex min-h-screen flex-col p-8">
@@ -145,6 +161,37 @@ export default function UploadPage() {
         <p className="text-gray-600 mb-8">
           工事写真をドラッグ&ドロップまたは選択してアップロードしてください。
         </p>
+
+        {/* プロジェクト選択 */}
+        <div className="mb-6 p-4 bg-white border border-gray-200 rounded-lg">
+          <label htmlFor="project-select" className="block text-sm font-medium text-gray-700 mb-2">
+            アップロード先プロジェクト <span className="text-red-500">*</span>
+          </label>
+          {projectsLoading ? (
+            <div className="text-sm text-gray-500">プロジェクトを読み込み中...</div>
+          ) : projects && projects.length > 0 ? (
+            <select
+              id="project-select"
+              value={selectedProjectId || ''}
+              onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>プロジェクトを選択</option>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <div className="text-sm text-amber-600">
+              プロジェクトがありません。
+              <a href="/projects/new" className="text-blue-600 hover:underline ml-2">
+                新しいプロジェクトを作成
+              </a>
+            </div>
+          )}
+        </div>
 
         <DragDropZone onFilesSelected={handleFilesSelected} />
 
@@ -262,10 +309,10 @@ export default function UploadPage() {
 
             <button
               onClick={handleUpload}
-              disabled={isUploading}
+              disabled={isUploading || !selectedProjectId}
               className="mt-4 w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
-              {isUploading ? 'アップロード中...' : 'アップロード開始'}
+              {isUploading ? 'アップロード中...' : !selectedProjectId ? 'プロジェクトを選択してください' : 'アップロード開始'}
             </button>
           </div>
         )}

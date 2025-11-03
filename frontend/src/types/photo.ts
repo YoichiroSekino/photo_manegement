@@ -7,6 +7,7 @@ export interface Photo {
   fileName: string;
   fileSize: number;
   mimeType: string;
+  projectId: number;
   s3Url?: string;
   thumbnailUrl?: string;
   title?: string;

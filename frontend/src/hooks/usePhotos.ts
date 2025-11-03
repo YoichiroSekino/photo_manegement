@@ -48,6 +48,7 @@ export interface PhotoAPIResponse {
   created_at: string;
   updated_at: string;
   organization_id: number;
+  project_id: number;
 }
 
 export interface PhotoListAPIResponse {
@@ -110,6 +111,7 @@ function mapAPIResponseToPhoto(apiPhoto: PhotoAPIResponse): Photo {
     fileName: apiPhoto.file_name,
     fileSize: apiPhoto.file_size,
     mimeType: apiPhoto.mime_type,
+    projectId: apiPhoto.project_id,
     s3Url: apiPhoto.s3_url ?? `https://${process.env.NEXT_PUBLIC_S3_BUCKET || 'construction-photos-dev'}.s3.${process.env.NEXT_PUBLIC_AWS_REGION || 'ap-northeast-1'}.amazonaws.com/${apiPhoto.s3_key}`,
     title: apiPhoto.title ?? apiPhoto.photo_title ?? undefined,
     description: apiPhoto.description ?? undefined,
