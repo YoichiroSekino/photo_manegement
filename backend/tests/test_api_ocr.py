@@ -5,7 +5,7 @@ OCR処理APIエンドポイントのテスト（マルチテナント対応）
 import pytest
 from unittest.mock import Mock, patch
 from app.services.ocr_service import BlackboardData
-from app.database.models import Organization, User
+from app.database.models import Organization, User, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -28,7 +28,6 @@ class TestOCRAPI:
             email="test@testcompany.com",
             hashed_password="hashed",
             organization_id=test_org.id,
-            is_active=True,
         )
         db.add(user)
         db.commit()
@@ -36,12 +35,24 @@ class TestOCRAPI:
         return user
 
     @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            name="Test Construction Project",
+            organization_id=test_org.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
+
+    @pytest.fixture
     def auth_headers(self, test_user):
         """認証ヘッダー"""
         tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
-    def test_process_ocr(self, client, auth_headers):
+    def test_process_ocr(self, client, auth_headers, test_project):
         """OCR処理トリガーAPIのテスト"""
         # まず写真を作成
         photo_data = {
@@ -49,6 +60,7 @@ class TestOCRAPI:
             "file_size": 2048000,
             "mime_type": "image/jpeg",
             "s3_key": "photos/blackboard.jpg",
+            "project_id": test_project.id,
         }
         create_response = client.post(
             "/api/v1/photos", json=photo_data, headers=auth_headers
@@ -83,7 +95,7 @@ class TestOCRAPI:
             assert data["blackboard_data"]["work_name"] == "テスト工事"
             assert data["blackboard_data"]["work_type"] == "土工"
 
-    def test_get_ocr_result(self, client, auth_headers):
+    def test_get_ocr_result(self, client, auth_headers, test_project):
         """OCR結果取得APIのテスト"""
         # 写真を作成してOCR処理
         photo_data = {
@@ -91,6 +103,7 @@ class TestOCRAPI:
             "file_size": 2048000,
             "mime_type": "image/jpeg",
             "s3_key": "photos/blackboard.jpg",
+            "project_id": test_project.id,
         }
         create_response = client.post(
             "/api/v1/photos", json=photo_data, headers=auth_headers
@@ -129,7 +142,7 @@ class TestOCRAPI:
         response = client.post("/api/v1/photos/99999/process-ocr", headers=auth_headers)
         assert response.status_code == 404
 
-    def test_get_ocr_result_not_processed(self, client, auth_headers):
+    def test_get_ocr_result_not_processed(self, client, auth_headers, test_project):
         """OCR未処理の写真の結果取得テスト"""
         # 写真を作成（OCR処理なし）
         photo_data = {
@@ -137,6 +150,7 @@ class TestOCRAPI:
             "file_size": 1024000,
             "mime_type": "image/jpeg",
             "s3_key": "photos/no_ocr.jpg",
+            "project_id": test_project.id,
         }
         create_response = client.post(
             "/api/v1/photos", json=photo_data, headers=auth_headers

@@ -5,7 +5,7 @@ Amazon Rekognition API エンドポイントのテスト（マルチテナント
 import pytest
 from unittest.mock import Mock, patch
 
-from app.database.models import Photo, Organization, User
+from app.database.models import Photo, Organization, User, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -36,16 +36,29 @@ class TestRekognitionAPI:
         return user
 
     @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            name="Test Project",
+            organization_id=test_org.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
+
+    @pytest.fixture
     def auth_headers(self, test_user):
         """認証ヘッダー"""
         tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
     @pytest.fixture
-    def sample_photo(self, db, test_org):
+    def sample_photo(self, db, test_org, test_project):
         """テスト用写真データ作成"""
         photo = Photo(
             organization_id=test_org.id,
+            project_id=test_project.id,
             file_name="test_construction.jpg",
             file_size=2048000,
             mime_type="image/jpeg",

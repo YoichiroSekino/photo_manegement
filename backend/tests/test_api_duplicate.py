@@ -3,7 +3,7 @@
 """
 
 import pytest
-from app.database.models import Organization, User, Photo
+from app.database.models import Organization, User, Project, Photo
 from app.auth.jwt_handler import create_tokens
 
 
@@ -26,12 +26,23 @@ class TestDuplicateAPI:
             email="test@testcompany.com",
             hashed_password="hashed",
             organization_id=test_org.id,
-            is_active=True,
         )
         db.add(user)
         db.commit()
         db.refresh(user)
         return user
+
+    @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            name="Test Construction Project",
+            organization_id=test_org.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
 
     @pytest.fixture
     def auth_headers(self, test_user):
@@ -40,7 +51,7 @@ class TestDuplicateAPI:
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
     @pytest.fixture
-    def test_photos_with_phash(self, db, test_org):
+    def test_photos_with_phash(self, db, test_org, test_project):
         """pHashを持つテスト写真"""
         photos = []
         for i in range(3):
@@ -50,6 +61,7 @@ class TestDuplicateAPI:
                 mime_type="image/jpeg",
                 s3_key=f"photos/test{i}.jpg",
                 organization_id=test_org.id,
+                project_id=test_project.id,
                 photo_metadata={"phash": f"0123456789abcde{i}"},
             )
             db.add(photo)
@@ -82,7 +94,7 @@ class TestDuplicateAPI:
         assert "duplicate_groups" in data
         assert "summary" in data
 
-    def test_calculate_phash_success(self, client, auth_headers, db, test_org):
+    def test_calculate_phash_success(self, client, auth_headers, db, test_org, test_project):
         """pHash計算成功"""
         # モック用の写真を作成（pHashなし）
         photo = Photo(
@@ -91,6 +103,7 @@ class TestDuplicateAPI:
             mime_type="image/jpeg",
             s3_key="photos/test.jpg",
             organization_id=test_org.id,
+            project_id=test_project.id,
         )
         db.add(photo)
         db.commit()

@@ -6,7 +6,22 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.database.models import Photo
+from app.database.models import Photo, Project
+
+
+@pytest.fixture
+def test_project(db, test_org):
+    """Test project fixture."""
+    project = Project(
+        organization_id=test_org.id,
+        name="Test Project",
+        description="Test project",
+        
+    )
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+    return project
 
 
 def test_get_dashboard_stats_unauthenticated(client: TestClient):
@@ -33,7 +48,7 @@ def test_get_dashboard_stats_empty(
 
 
 def test_get_dashboard_stats_with_data(
-    client: TestClient, db: Session, auth_headers: dict, test_org
+    client: TestClient, db: Session, auth_headers: dict, test_org, test_project
 ):
     """Test getting dashboard stats with sample data."""
     # Create photos with various attributes
@@ -48,6 +63,7 @@ def test_get_dashboard_stats_with_data(
         mime_type="image/jpeg",
         s3_key="photos/P0000001.JPG",
         organization_id=test_org.id,
+        project_id=test_project.id,
         title="Today Photo",
         major_category="施工状況写真",
         shooting_date=today.date(),
@@ -62,6 +78,7 @@ def test_get_dashboard_stats_with_data(
         mime_type="image/jpeg",
         s3_key="photos/P0000002.JPG",
         organization_id=test_org.id,
+        project_id=test_project.id,
         title="Yesterday Photo",
         major_category="施工状況写真",
         shooting_date=yesterday.date(),
@@ -76,6 +93,7 @@ def test_get_dashboard_stats_with_data(
         mime_type="image/jpeg",
         s3_key="photos/P0000003.JPG",
         organization_id=test_org.id,
+        project_id=test_project.id,
         title="Last Week Photo",
         major_category="安全管理写真",
         shooting_date=last_week.date(),
@@ -90,6 +108,7 @@ def test_get_dashboard_stats_with_data(
         mime_type="image/jpeg",
         s3_key="photos/P0000004.JPG",
         organization_id=test_org.id,
+        project_id=test_project.id,
         title="Duplicate 1",
         major_category="品質管理写真",
         shooting_date=today.date(),
@@ -104,6 +123,7 @@ def test_get_dashboard_stats_with_data(
         mime_type="image/jpeg",
         s3_key="photos/P0000005.JPG",
         organization_id=test_org.id,
+        project_id=test_project.id,
         title="Duplicate 2",
         major_category="品質管理写真",
         shooting_date=today.date(),
@@ -151,7 +171,7 @@ def test_get_recent_photos_empty(
 
 
 def test_get_recent_photos_with_data(
-    client: TestClient, db: Session, auth_headers: dict, test_org
+    client: TestClient, db: Session, auth_headers: dict, test_org, test_project
 ):
     """Test getting recent photos with sample data."""
     # Create 10 photos
@@ -163,6 +183,7 @@ def test_get_recent_photos_with_data(
             mime_type="image/jpeg",
             s3_key=f"photos/P{i:07d}.JPG",
             organization_id=test_org.id,
+            project_id=test_project.id,
             title=f"Photo {i}",
             major_category="施工状況写真",
             shooting_date=datetime.utcnow().date(),
@@ -197,7 +218,7 @@ def test_get_recent_photos_with_data(
 
 
 def test_get_recent_photos_custom_limit(
-    client: TestClient, db: Session, auth_headers: dict, test_org
+    client: TestClient, db: Session, auth_headers: dict, test_org, test_project
 ):
     """Test getting recent photos with custom limit."""
     # Create 10 photos
@@ -209,6 +230,7 @@ def test_get_recent_photos_custom_limit(
             mime_type="image/jpeg",
             s3_key=f"photos/P{i:07d}.JPG",
             organization_id=test_org.id,
+            project_id=test_project.id,
             title=f"Photo {i}",
             major_category="施工状況写真",
             shooting_date=datetime.utcnow().date(),

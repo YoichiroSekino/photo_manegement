@@ -74,11 +74,11 @@ class Photo(Base):
     )
     organization = relationship("Organization")
 
-    # プロジェクト関連
+    # プロジェクト関連（必須）
     project_id = Column(
         Integer,
         ForeignKey("projects.id", ondelete="RESTRICT"),
-        nullable=True,
+        nullable=False,
         index=True,
     )
     project = relationship("Project", back_populates="photos")

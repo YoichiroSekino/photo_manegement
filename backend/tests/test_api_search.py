@@ -4,7 +4,7 @@
 
 import pytest
 from datetime import datetime
-from app.database.models import Organization, User
+from app.database.models import Organization, User, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -35,13 +35,27 @@ class TestSearchAPI:
         return user
 
     @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            organization_id=test_org.id,
+            name="Test Project",
+            description="Test Project Description",
+            
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
+
+    @pytest.fixture
     def auth_headers(self, test_user):
         """認証ヘッダー"""
         tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
     @pytest.fixture
-    def sample_photos(self, client, auth_headers):
+    def sample_photos(self, client, auth_headers, test_project):
         """テスト用サンプル写真データ"""
         photos_data = [
             {
@@ -56,6 +70,7 @@ class TestSearchAPI:
                 "work_kind": "掘削工",
                 "major_category": "工事",
                 "photo_type": "施工状況写真",
+                "project_id": test_project.id,
             },
             {
                 "file_name": "基礎工_配筋_002.jpg",
@@ -69,6 +84,7 @@ class TestSearchAPI:
                 "work_kind": "配筋工",
                 "major_category": "工事",
                 "photo_type": "品質管理写真",
+                "project_id": test_project.id,
             },
             {
                 "file_name": "土工_埋戻_003.jpg",
@@ -82,6 +98,7 @@ class TestSearchAPI:
                 "work_kind": "埋戻工",
                 "major_category": "工事",
                 "photo_type": "施工状況写真",
+                "project_id": test_project.id,
             },
             {
                 "file_name": "基礎工_型枠_004.jpg",
@@ -95,6 +112,7 @@ class TestSearchAPI:
                 "work_kind": "型枠工",
                 "major_category": "安全",
                 "photo_type": "安全管理写真",
+                "project_id": test_project.id,
             },
         ]
 

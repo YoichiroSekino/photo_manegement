@@ -4,7 +4,7 @@
 
 import pytest
 from datetime import datetime
-from app.database.models import Organization, User, Photo
+from app.database.models import Organization, User, Photo, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -48,9 +48,37 @@ class TestSearchAPIMultitenant:
         return user1, user2
 
     @pytest.fixture
-    def test_photos(self, db, test_organizations):
+    def test_projects(self, db, test_organizations):
+        """テスト用プロジェクト"""
+        org1, org2 = test_organizations
+
+        project1 = Project(
+            name="Project A1",
+            description="Organization A Project 1",
+            organization_id=org1.id,
+        )
+        project2 = Project(
+            name="Project A2",
+            description="Organization A Project 2",
+            organization_id=org1.id,
+        )
+        project3 = Project(
+            name="Project B1",
+            description="Organization B Project 1",
+            organization_id=org2.id,
+        )
+        db.add_all([project1, project2, project3])
+        db.commit()
+        db.refresh(project1)
+        db.refresh(project2)
+        db.refresh(project3)
+        return project1, project2, project3
+
+    @pytest.fixture
+    def test_photos(self, db, test_organizations, test_projects):
         """テスト用写真"""
         org1, org2 = test_organizations
+        project1, project2, project3 = test_projects
 
         # org1の写真
         photo1 = Photo(
@@ -59,6 +87,7 @@ class TestSearchAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo1.jpg",
             organization_id=org1.id,
+            project_id=project1.id,
             title="橋梁工事",
             description="橋の建設現場",
             work_type="橋梁工事",
@@ -72,6 +101,7 @@ class TestSearchAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo2.jpg",
             organization_id=org1.id,
+            project_id=project2.id,
             title="道路工事",
             description="道路舗装工事",
             work_type="道路工事",
@@ -87,6 +117,7 @@ class TestSearchAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo3.jpg",
             organization_id=org2.id,
+            project_id=project3.id,
             title="トンネル工事",
             description="トンネル掘削現場",
             work_type="トンネル工事",
@@ -100,7 +131,7 @@ class TestSearchAPIMultitenant:
         return photo1, photo2, photo3
 
     def test_search_all_photos_filtered_by_organization(
-        self, client, db, test_users, test_photos
+        self, client, db, test_users, test_projects, test_photos
     ):
         """検索結果が組織でフィルタリングされることを確認"""
         user1, user2 = test_users
@@ -137,7 +168,7 @@ class TestSearchAPIMultitenant:
         assert photo2.id not in photo_ids2
 
     def test_search_with_keyword_filtered_by_organization(
-        self, client, db, test_users, test_photos
+        self, client, db, test_users, test_projects, test_photos
     ):
         """キーワード検索が組織でフィルタリングされることを確認"""
         user1, user2 = test_users
@@ -167,7 +198,7 @@ class TestSearchAPIMultitenant:
         assert data2["total"] == 0
 
     def test_search_with_filters_filtered_by_organization(
-        self, client, db, test_users, test_photos
+        self, client, db, test_users, test_projects, test_photos
     ):
         """フィルタ検索が組織でフィルタリングされることを確認"""
         user1, _ = test_users
@@ -185,7 +216,9 @@ class TestSearchAPIMultitenant:
         assert data["total"] == 1
         assert data["items"][0]["id"] == photo1.id
 
-    def test_search_unauthenticated_access_denied(self, client, db, test_photos):
+    def test_search_unauthenticated_access_denied(
+        self, client, db, test_projects, test_photos
+    ):
         """認証なし検索は拒否されることを確認"""
         # 認証なしで検索 -> 403
         response = client.get("/api/v1/photos/search")

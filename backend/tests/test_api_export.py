@@ -4,7 +4,7 @@
 
 import pytest
 from datetime import datetime
-from app.database.models import Organization, User, Photo
+from app.database.models import Organization, User, Photo, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -35,13 +35,26 @@ class TestExportAPI:
         return user
 
     @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            name="Test Project",
+            description="Test project description",
+            organization_id=test_org.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
+
+    @pytest.fixture
     def auth_headers(self, test_user):
         """認証ヘッダー"""
         tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
     @pytest.fixture
-    def test_photos(self, db, test_org):
+    def test_photos(self, db, test_org, test_project):
         """テスト用写真データ"""
         photos = []
         for i in range(3):
@@ -51,6 +64,7 @@ class TestExportAPI:
                 mime_type="image/jpeg",
                 s3_key=f"photos/P000000{i+1}.JPG",
                 organization_id=test_org.id,
+                project_id=test_project.id,
                 title=f"テスト写真{i+1}",
                 major_category="工事",
                 photo_type="施工状況写真",
@@ -141,7 +155,7 @@ class TestExportAPI:
         assert data["is_valid"] is False
         assert data["total_photos"] == 0
 
-    def test_validate_export_warnings(self, client, auth_headers, db, test_org):
+    def test_validate_export_warnings(self, client, auth_headers, db, test_org, test_project):
         """エクスポートバリデーション - 警告あり（タイトルなし）"""
         # タイトルなしの写真を作成
         photo = Photo(
@@ -150,6 +164,7 @@ class TestExportAPI:
             mime_type="image/jpeg",
             s3_key="photos/P0000099.JPG",
             organization_id=test_org.id,
+            project_id=test_project.id,
             title=None,  # タイトルなし
         )
         db.add(photo)
@@ -197,13 +212,23 @@ class TestExportAPI:
         # FastAPIのDependsは認証なしで403を返す
         assert response.status_code == 403
 
-    def test_export_different_organization(self, client, auth_headers, db):
+    def test_export_different_organization(self, client, auth_headers, db, test_project):
         """他組織の写真をエクスポート試行"""
         # 別組織を作成
         other_org = Organization(name="Other Company", subdomain="othercompany", is_active=True)
         db.add(other_org)
         db.commit()
         db.refresh(other_org)
+
+        # 別組織のプロジェクトを作成
+        other_project = Project(
+            name="Other Project",
+            description="Other project description",
+            organization_id=other_org.id,
+        )
+        db.add(other_project)
+        db.commit()
+        db.refresh(other_project)
 
         # 別組織の写真を作成
         other_photo = Photo(
@@ -212,6 +237,7 @@ class TestExportAPI:
             mime_type="image/jpeg",
             s3_key="photos/P0000099.JPG",
             organization_id=other_org.id,
+            project_id=other_project.id,
         )
         db.add(other_photo)
         db.commit()

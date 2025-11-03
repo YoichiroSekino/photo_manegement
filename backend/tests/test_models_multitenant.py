@@ -76,12 +76,23 @@ class TestMultitenantModels:
         """Photoモデルにorganization_idが存在することを確認"""
         org1, _ = sample_organizations
 
+        # テスト用プロジェクト作成
+        project = Project(
+            name="Test Project",
+            description="Test Description",
+            organization_id=org1.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+
         photo = Photo(
             file_name="test.jpg",
             file_size=1024000,
             mime_type="image/jpeg",
             s3_key="photos/test.jpg",
             organization_id=org1.id,
+            project_id=project.id,
         )
         db.add(photo)
         db.commit()
@@ -92,11 +103,24 @@ class TestMultitenantModels:
 
     def test_photo_organization_id_required(self, db, sample_organizations):
         """Photoのorganization_idが必須であることを確認"""
+        org1, _ = sample_organizations
+
+        # テスト用プロジェクト作成
+        project = Project(
+            name="Test Project",
+            description="Test Description",
+            organization_id=org1.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+
         photo = Photo(
             file_name="test.jpg",
             file_size=1024000,
             mime_type="image/jpeg",
             s3_key="photos/noorg.jpg",
+            project_id=project.id,
         )  # organization_idなし
 
         db.add(photo)
@@ -129,6 +153,16 @@ class TestMultitenantModels:
         """PhotoDuplicateモデルにorganization_idが存在することを確認"""
         org1, _ = sample_organizations
 
+        # テスト用プロジェクト作成
+        project = Project(
+            name="Test Project",
+            description="Test Description",
+            organization_id=org1.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+
         # テスト用写真作成
         photo1 = Photo(
             file_name="p1.jpg",
@@ -136,6 +170,7 @@ class TestMultitenantModels:
             mime_type="image/jpeg",
             s3_key="photos/p1.jpg",
             organization_id=org1.id,
+            project_id=project.id,
         )
         photo2 = Photo(
             file_name="p2.jpg",
@@ -143,6 +178,7 @@ class TestMultitenantModels:
             mime_type="image/jpeg",
             s3_key="photos/p2.jpg",
             organization_id=org1.id,
+            project_id=project.id,
         )
         db.add(photo1)
         db.add(photo2)
@@ -189,12 +225,30 @@ class TestMultitenantModels:
         """テナント間で写真が分離されることを確認"""
         org1, org2 = sample_organizations
 
+        # テスト用プロジェクト作成
+        project1 = Project(
+            name="Project 1",
+            description="Test Description",
+            organization_id=org1.id,
+        )
+        project2 = Project(
+            name="Project 2",
+            description="Test Description",
+            organization_id=org2.id,
+        )
+        db.add(project1)
+        db.add(project2)
+        db.commit()
+        db.refresh(project1)
+        db.refresh(project2)
+
         photo1 = Photo(
             file_name="org1.jpg",
             file_size=1024,
             mime_type="image/jpeg",
             s3_key="photos/org1.jpg",
             organization_id=org1.id,
+            project_id=project1.id,
         )
         photo2 = Photo(
             file_name="org2.jpg",
@@ -202,6 +256,7 @@ class TestMultitenantModels:
             mime_type="image/jpeg",
             s3_key="photos/org2.jpg",
             organization_id=org2.id,
+            project_id=project2.id,
         )
         db.add(photo1)
         db.add(photo2)
@@ -221,6 +276,16 @@ class TestMultitenantModels:
         """組織削除時の関連データのカスケード動作を確認"""
         org1, _ = sample_organizations
 
+        # テスト用プロジェクト作成
+        project = Project(
+            name="Test Project",
+            description="Test Description",
+            organization_id=org1.id,
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+
         # テストデータ作成
         user = User(
             email="test@example.com", hashed_password="hash", organization_id=org1.id
@@ -231,6 +296,7 @@ class TestMultitenantModels:
             mime_type="image/jpeg",
             s3_key="photos/test.jpg",
             organization_id=org1.id,
+            project_id=project.id,
         )
         db.add(user)
         db.add(photo)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
-from app.database.models import Base, Organization, User
+from app.database.models import Base, Organization, User, Project
 from app.database.database import get_db
 from app.main import app
 from app.auth.jwt_handler import create_tokens
@@ -86,6 +86,20 @@ def test_user(db, test_org):
     db.commit()
     db.refresh(user)
     return user
+
+
+@pytest.fixture
+def test_project(db, test_org):
+    """テスト用プロジェクト"""
+    project = Project(
+        organization_id=test_org.id,
+        name="Test Project",
+        description="Test Project Description",
+    )
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+    return project
 
 
 @pytest.fixture

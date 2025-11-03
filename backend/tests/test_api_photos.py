@@ -4,7 +4,7 @@
 
 import pytest
 from datetime import datetime
-from app.database.models import Organization, User
+from app.database.models import Organization, User, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -35,12 +35,25 @@ class TestPhotosAPI:
         return user
 
     @pytest.fixture
+    def test_project(self, db, test_org):
+        """テスト用プロジェクト"""
+        project = Project(
+            organization_id=test_org.id,
+            name="Test Project",
+            description="Test Project Description",
+        )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
+        return project
+
+    @pytest.fixture
     def auth_headers(self, test_user):
         """認証ヘッダー"""
         tokens = create_tokens(test_user.id, test_user.email, test_user.organization_id)
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 
-    def test_create_photo(self, client, auth_headers):
+    def test_create_photo(self, client, auth_headers, test_project):
         """写真作成APIのテスト"""
         photo_data = {
             "file_name": "test.jpg",
@@ -48,6 +61,7 @@ class TestPhotosAPI:
             "mime_type": "image/jpeg",
             "s3_key": "photos/test.jpg",
             "title": "テスト写真",
+            "project_id": test_project.id,
         }
 
         response = client.post("/api/v1/photos", json=photo_data, headers=auth_headers)
@@ -67,7 +81,7 @@ class TestPhotosAPI:
         assert "total" in data
         assert isinstance(data["items"], list)
 
-    def test_get_photo_by_id(self, client, auth_headers):
+    def test_get_photo_by_id(self, client, auth_headers, test_project):
         """写真詳細取得APIのテスト"""
         # まず写真を作成
         photo_data = {
@@ -75,6 +89,7 @@ class TestPhotosAPI:
             "file_size": 2048000,
             "mime_type": "image/jpeg",
             "s3_key": "photos/test2.jpg",
+            "project_id": test_project.id,
         }
         create_response = client.post(
             "/api/v1/photos", json=photo_data, headers=auth_headers
@@ -93,13 +108,14 @@ class TestPhotosAPI:
         response = client.get("/api/v1/photos/99999", headers=auth_headers)
         assert response.status_code == 404
 
-    def test_create_photo_invalid_mime_type(self, client, auth_headers):
+    def test_create_photo_invalid_mime_type(self, client, auth_headers, test_project):
         """無効なMIMEタイプでの写真作成テスト"""
         photo_data = {
             "file_name": "test_invalid.png",
             "file_size": 1024000,
             "mime_type": "image/png",  # 無効（許可されていない形式）
             "s3_key": "photos/test_invalid.png",
+            "project_id": test_project.id,
         }
 
         response = client.post("/api/v1/photos", json=photo_data, headers=auth_headers)

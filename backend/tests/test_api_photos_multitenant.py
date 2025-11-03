@@ -3,7 +3,7 @@
 """
 
 import pytest
-from app.database.models import Organization, User, Photo
+from app.database.models import Organization, User, Photo, Project
 from app.auth.jwt_handler import create_tokens
 
 
@@ -21,6 +21,30 @@ class TestPhotosAPIMultitenant:
         db.refresh(org1)
         db.refresh(org2)
         return org1, org2
+
+    @pytest.fixture
+    def test_projects(self, db, test_organizations):
+        """テスト用プロジェクト"""
+        org1, org2 = test_organizations
+
+        project1 = Project(
+            organization_id=org1.id,
+            name="Project A",
+            description="Project A Description",
+            
+        )
+        project2 = Project(
+            organization_id=org2.id,
+            name="Project B",
+            description="Project B Description",
+            
+        )
+        db.add(project1)
+        db.add(project2)
+        db.commit()
+        db.refresh(project1)
+        db.refresh(project2)
+        return project1, project2
 
     @pytest.fixture
     def test_users(self, db, test_organizations):
@@ -47,9 +71,10 @@ class TestPhotosAPIMultitenant:
         return user1, user2
 
     @pytest.fixture
-    def test_photos(self, db, test_organizations):
+    def test_photos(self, db, test_organizations, test_projects):
         """テスト用写真"""
         org1, org2 = test_organizations
+        project1, project2 = test_projects
 
         # org1の写真
         photo1 = Photo(
@@ -58,6 +83,7 @@ class TestPhotosAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo1.jpg",
             organization_id=org1.id,
+            project_id=project1.id,
         )
         photo2 = Photo(
             file_name="photo2.jpg",
@@ -65,6 +91,7 @@ class TestPhotosAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo2.jpg",
             organization_id=org1.id,
+            project_id=project1.id,
         )
 
         # org2の写真
@@ -74,19 +101,21 @@ class TestPhotosAPIMultitenant:
             mime_type="image/jpeg",
             s3_key="photos/photo3.jpg",
             organization_id=org2.id,
+            project_id=project2.id,
         )
 
         db.add_all([photo1, photo2, photo3])
         db.commit()
         return photo1, photo2, photo3
 
-    def test_create_photo_auto_assigns_organization_id(self, client, db, test_users):
+    def test_create_photo_auto_assigns_organization_id(self, client, db, test_users, test_projects):
         """写真作成時にorganization_idが自動的に設定されることを確認"""
         user1, _ = test_users
 
         # JWTトークン作成
         tokens = create_tokens(user1.id, user1.email, user1.organization_id)
         access_token = tokens["access_token"]
+        project1, _ = test_projects
 
         # 写真作成リクエスト
         photo_data = {
@@ -94,6 +123,7 @@ class TestPhotosAPIMultitenant:
             "file_size": 5000,
             "mime_type": "image/jpeg",
             "s3_key": "photos/new_photo.jpg",
+            "project_id": project1.id,
         }
 
         response = client.post(

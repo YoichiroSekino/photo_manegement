@@ -50,7 +50,7 @@ class PhotoBase(BaseModel):
 class PhotoCreate(PhotoBase):
     """写真作成スキーマ"""
 
-    project_id: Optional[int] = Field(None, description="プロジェクトID")
+    project_id: int = Field(..., description="プロジェクトID（必須）")
     s3_url: Optional[str] = Field(None, max_length=500, description="S3 URL")
     major_category: Optional[str] = None
     photo_type: Optional[str] = None
@@ -78,7 +78,7 @@ class PhotoResponse(PhotoBase):
 
     id: int
     organization_id: int
-    project_id: Optional[int] = None
+    project_id: int
     s3_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
 

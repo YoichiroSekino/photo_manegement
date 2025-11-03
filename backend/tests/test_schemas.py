@@ -14,6 +14,7 @@ def test_photo_create_schema():
         "file_size": 1024000,
         "mime_type": "image/jpeg",
         "s3_key": "photos/test.jpg",
+        "project_id": 1,
     }
     photo = PhotoCreate(**data)
 
@@ -21,6 +22,7 @@ def test_photo_create_schema():
     assert photo.file_size == 1024000
     assert photo.mime_type == "image/jpeg"
     assert photo.s3_key == "photos/test.jpg"
+    assert photo.project_id == 1
 
 
 def test_photo_create_with_optional_fields():
@@ -30,6 +32,7 @@ def test_photo_create_with_optional_fields():
         "file_size": 1024000,
         "mime_type": "image/jpeg",
         "s3_key": "photos/test.jpg",
+        "project_id": 1,
         "title": "テスト写真",
         "description": "これはテストです",
         "shooting_date": datetime(2024, 3, 15),
@@ -39,6 +42,7 @@ def test_photo_create_with_optional_fields():
     assert photo.title == "テスト写真"
     assert photo.description == "これはテストです"
     assert photo.shooting_date.year == 2024
+    assert photo.project_id == 1
 
 
 def test_photo_response_schema():
@@ -46,6 +50,7 @@ def test_photo_response_schema():
     data = {
         "id": 1,
         "organization_id": 1,  # マルチテナント対応：organization_id必須
+        "project_id": 1,
         "file_name": "test.jpg",
         "file_size": 1024000,
         "mime_type": "image/jpeg",
@@ -58,6 +63,7 @@ def test_photo_response_schema():
 
     assert photo.id == 1
     assert photo.organization_id == 1
+    assert photo.project_id == 1
     assert photo.file_name == "test.jpg"
     assert photo.s3_url == "https://example.com/test.jpg"
 
@@ -83,6 +89,7 @@ def test_invalid_mime_type():
         "file_size": 1024000,
         "mime_type": "image/png",  # PNGは無効
         "s3_key": "photos/test.png",
+        "project_id": 1,
     }
 
     with pytest.raises(ValueError):
