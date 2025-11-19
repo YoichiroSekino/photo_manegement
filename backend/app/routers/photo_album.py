@@ -5,6 +5,7 @@
 import tempfile
 import os
 from typing import List
+import boto3
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -17,6 +18,7 @@ from app.schemas.photo_album import (
     LayoutType as LayoutTypeSchema,
 )
 from app.services.photo_album_generator import PhotoAlbumGenerator, LayoutType
+from app.config import settings
 
 router = APIRouter(prefix="/api/v1/photo-album", tags=["photo-album"])
 
@@ -48,9 +50,24 @@ async def generate_photo_album_pdf(
             detail=f"一部の写真が見つかりません（指定: {len(request.photo_ids)}件, 取得: {len(photos)}件）",
         )
 
+    # S3クライアント初期化
+    s3_client = boto3.client("s3")
+
     # 写真データをディクショナリに変換
     photo_dicts = []
     for photo in photos:
+        # S3から画像データを取得
+        image_data = None
+        if photo.s3_key:
+            try:
+                response = s3_client.get_object(
+                    Bucket=settings.S3_BUCKET, Key=photo.s3_key
+                )
+                image_data = response["Body"].read()
+            except Exception as e:
+                # S3からの取得に失敗した場合はログに記録してスキップ
+                print(f"Warning: Failed to download image from S3: {photo.s3_key}, Error: {str(e)}")
+
         photo_dict = {
             "id": photo.id,
             "file_name": photo.file_name,
@@ -63,7 +80,7 @@ async def generate_photo_album_pdf(
             "work_type": photo.work_type or "",
             "work_kind": photo.work_kind or "",
             "work_detail": photo.work_detail or "",
-            "image_data": None,  # TODO: S3から画像データ取得
+            "image_data": image_data,
         }
         photo_dicts.append(photo_dict)
 
